@@ -1,6 +1,6 @@
-import { Header } from "@/components/layout/header";
+import { AppHeader } from "@/components/layout/app-header";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Footer } from "@/components/layout/footer";
+import { AppFooter } from "@/components/layout/app-footer";
 
 export default function DashboardLayout({
   children,
@@ -11,9 +11,9 @@ export default function DashboardLayout({
     <div className="flex min-h-screen">
       <Sidebar />
       <div className="flex flex-1 flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 p-6 bg-gray-50">{children}</main>
-        <Footer />
+        <AppFooter />
       </div>
     </div>
   );

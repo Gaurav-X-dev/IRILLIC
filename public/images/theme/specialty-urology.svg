@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <radialGradient id="t" cx="50%" cy="45%" r="75%"><stop offset="0" stop-color="#e9a896"/><stop offset=".55" stop-color="#c46a5c"/><stop offset="1" stop-color="#3f1616"/></radialGradient>
+  <filter id="g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="800" height="500" fill="url(#t)"/>
+<ellipse cx="420" cy="240" rx="200" ry="120" fill="#efc09a" opacity=".45"/>
+<rect width="800" height="500" fill="#06140e" opacity=".5"/>
+<g filter="url(#g)" fill="none" stroke-linecap="round">
+  <path d="M 120 -20 C 180 120, 140 220, 260 300 S 420 420, 470 540" stroke="#2bff8a" stroke-width="20"/>
+  <path d="M 700 -20 C 640 120, 690 230, 580 310 S 470 420, 470 540" stroke="#2bff8a" stroke-width="20"/>
+</g>
+<g fill="none" stroke="#e6fff1" stroke-width="6" stroke-linecap="round" opacity=".9"><path d="M 120 -20 C 180 120, 140 220, 260 300 S 420 420, 470 540"/><path d="M 700 -20 C 640 120, 690 230, 580 310 S 470 420, 470 540"/></g>
+</svg>

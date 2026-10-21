@@ -1,81 +1,111 @@
 import { forwardRef } from "react";
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+/**
+ * Motherson-style pill buttons (Theme 1).
+ * - `pill`: red #DA2128 pill that inverts to charcoal #120304 on hover, right arrow nudges forward.
+ * - `outline`: hairline charcoal pill with a red up-right arrow.
+ * - `outline-light`: outline pill for dark backgrounds.
+ * Visual rules live in globals.css (.pill / .link-pill) so every pill on the site is identical.
+ */
+type Variant = "pill" | "outline" | "outline-light";
+type Size = "sm" | "md" | "lg";
+
+const variantClass: Record<Variant, string> = {
+  pill: "pill",
+  outline: "link-pill",
+  "outline-light": "link-pill link-pill--light",
+};
+
+function sizeClass(variant: Variant, size: Size): string {
+  if (variant === "pill") return size === "sm" ? "pill--sm" : size === "lg" ? "pill--lg" : "";
+  return size === "lg" ? "link-pill--lg" : "";
+}
+
+function DefaultIcon({ variant }: { variant: Variant }) {
+  return variant === "pill" ? (
+    <ArrowRight className="i" aria-hidden="true" />
+  ) : (
+    <ArrowUpRight className="i" aria-hidden="true" />
+  );
+}
+
+interface PillOptions {
+  variant?: Variant;
+  size?: Size;
+  /** Trailing icon. Defaults to the variant's arrow; pass `null` for none. */
+  icon?: React.ReactNode | null;
   isLoading?: boolean;
 }
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    PillOptions {}
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
-      variant = "primary",
+      variant = "pill",
       size = "md",
+      icon,
       isLoading = false,
       disabled,
       children,
+      type = "button",
       ...props
     },
     ref,
-  ) => {
-    const variants = {
-      primary:
-        "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500",
-      secondary:
-        "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500",
-      outline:
-        "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500",
-      ghost: "text-gray-700 hover:bg-gray-100 focus:ring-gray-500",
-      danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
-    };
+  ) => (
+    <button
+      ref={ref}
+      type={type}
+      className={cn(variantClass[variant], sizeClass(variant, size), className)}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
+      {...props}
+    >
+      {isLoading ? "Sending…" : children}
+      {!isLoading && (icon === undefined ? <DefaultIcon variant={variant} /> : icon)}
+    </button>
+  ),
+);
+Button.displayName = "Button";
 
-    const sizes = {
-      sm: "px-3 py-1.5 text-sm",
-      md: "px-4 py-2 text-sm",
-      lg: "px-6 py-3 text-base",
-    };
+export interface ButtonLinkProps
+  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
+    Omit<PillOptions, "isLoading"> {
+  href: string;
+  /** Opens in a new tab with rel="noopener" and an accessible hint */
+  external?: boolean;
+}
 
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          variants[variant],
-          sizes[size],
-          className,
-        )}
-        disabled={disabled || isLoading}
-        {...props}
-      >
-        {isLoading && (
-          <svg
-            className="mr-2 h-4 w-4 animate-spin"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            />
-          </svg>
-        )}
+const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+  ({ className, variant = "pill", size = "md", icon, href, external, children, ...props }, ref) => {
+    const classes = cn(variantClass[variant], sizeClass(variant, size), className);
+    const content = (
+      <>
         {children}
-      </button>
+        {icon === undefined ? <DefaultIcon variant={variant} /> : icon}
+        {external && <span className="sr-only">(opens in a new tab)</span>}
+      </>
+    );
+    if (external) {
+      return (
+        <a ref={ref} href={href} target="_blank" rel="noopener" className={classes} {...props}>
+          {content}
+        </a>
+      );
+    }
+    return (
+      <Link ref={ref} href={href} className={classes} {...props}>
+        {content}
+      </Link>
     );
   },
 );
+ButtonLink.displayName = "ButtonLink";
 
-Button.displayName = "Button";
-
-export { Button, type ButtonProps };
+export { Button, ButtonLink };

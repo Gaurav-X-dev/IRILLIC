@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"><defs>
+  <radialGradient id="t" cx="48%" cy="46%" r="75%"><stop offset="0" stop-color="#eeb3a0"/><stop offset=".45" stop-color="#d4796a"/><stop offset=".8" stop-color="#9c4640"/><stop offset="1" stop-color="#4a1a1a"/></radialGradient>
+  <filter id="g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<rect width="800" height="500" fill="url(#t)"/>
+<path d="M -40 300 C 120 120, 320 120, 400 260 S 640 420, 840 220" fill="none" stroke="#e7a08f" stroke-width="150" stroke-linecap="round"/>
+<path d="M -40 300 C 120 120, 320 120, 400 260 S 640 420, 840 220" fill="none" stroke="#c46a5c" stroke-width="150" stroke-linecap="round" opacity=".35" transform="translate(0 18)"/>
+<rect width="800" height="500" fill="#06140e" opacity=".5"/>
+<path d="M -40 300 C 120 120, 320 120, 400 260 S 640 420, 840 220" fill="none" stroke="#2bff8a" stroke-width="120" stroke-linecap="round" opacity=".55" filter="url(#b)" stroke-dasharray="1000 2000"/>
+<path d="M -40 300 C 120 120, 320 120, 400 260 S 640 420, 840 220" fill="none" stroke="#3dff96" stroke-width="70" stroke-linecap="round" opacity=".7" filter="url(#g)" stroke-dasharray="980 2000"/>
+<line x1="470" y1="120" x2="470" y2="470" stroke="#fff" stroke-width="3" stroke-dasharray="10 10" opacity=".9"/>
+</svg>

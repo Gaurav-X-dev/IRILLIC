@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450">
+
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset=".6" stop-color="#eef1f4"/>
+      <stop offset="1" stop-color="#c9d1d8"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b333b"/>
+      <stop offset="1" stop-color="#11161b"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a1414"/>
+      <stop offset="1" stop-color="#0c0606"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e9edf1"/>
+      <stop offset=".5" stop-color="#a8b1b9"/>
+      <stop offset="1" stop-color="#6c757d"/>
+    </linearGradient>
+    <radialGradient id="floor" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#0b2233" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#0b2233" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="g" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <ellipse cx="290" cy="418" rx="230" ry="22" fill="url(#floor)"/>
+  <!-- cart base -->
+  <path d="M 150 392 L 330 392 L 316 372 L 164 372 Z" fill="url(#dark)"/>
+  <circle cx="168" cy="404" r="12" fill="#1d2329"/><circle cx="312" cy="404" r="12" fill="#1d2329"/>
+  <circle cx="168" cy="404" r="4" fill="#8a949d"/><circle cx="312" cy="404" r="4" fill="#8a949d"/>
+  <rect x="226" y="170" width="28" height="205" rx="6" fill="url(#metal)"/>
+  <!-- control unit -->
+  <rect x="176" y="268" width="128" height="78" rx="12" fill="url(#body)" stroke="#d3d9df"/>
+  <rect x="176" y="268" width="128" height="8" rx="4" fill="#0091D0"/>
+  <circle cx="200" cy="320" r="7" fill="#0091D0"/><rect x="216" y="314" width="66" height="12" rx="6" fill="#dfe5ea"/>
+  <!-- monitor -->
+  <rect x="120" y="58" width="240" height="150" rx="12" fill="url(#dark)"/>
+  <rect x="132" y="70" width="216" height="126" rx="4" fill="url(#screen)"/><g transform="translate(132 70) scale(0.2700 0.2520)" filter="url(#g)"><path d="M 20 300 C 160 255, 260 335, 380 282 S 600 200, 790 232" fill="none" stroke="#2bff8a" stroke-width="13.5" stroke-linecap="round"/><path d="M 380 282 C 425 342, 470 382, 565 432" fill="none" stroke="#2bff8a" stroke-width="8.1" stroke-linecap="round"/><path d="M 232 300 C 252 222, 302 168, 362 112" fill="none" stroke="#2bff8a" stroke-width="7.2" stroke-linecap="round"/><path d="M 600 214 C 640 160, 690 118, 770 86" fill="none" stroke="#2bff8a" stroke-width="6.3" stroke-linecap="round"/><path d="M 120 282 C 132 352, 172 412, 245 482" fill="none" stroke="#2bff8a" stroke-width="6.3" stroke-linecap="round"/><path d="M 300 128 C 330 140, 345 160, 340 190" fill="none" stroke="#2bff8a" stroke-width="3.6" stroke-linecap="round"/><ellipse cx="524" cy="246" rx="34" ry="25" fill="#3dff96"/></g>
+  <rect x="226" y="208" width="28" height="12" fill="#1d2329"/>
+  <!-- articulating arm -->
+  <path d="M 254 238 L 392 196 L 470 236" fill="none" stroke="url(#metal)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="254" cy="238" r="13" fill="#d9dfe5" stroke="#9aa3ab"/>
+  <circle cx="392" cy="196" r="13" fill="#d9dfe5" stroke="#9aa3ab"/>
+  <!-- handheld NIR camera head -->
+  <g transform="rotate(18 492 262)">
+    <rect x="448" y="226" width="92" height="64" rx="18" fill="url(#body)" stroke="#c4ccd3"/>
+    <rect x="456" y="236" width="10" height="44" rx="5" fill="#0091D0"/>
+    <rect x="530" y="236" width="22" height="44" rx="8" fill="url(#dark)"/>
+    <circle cx="552" cy="258" r="15" fill="#11161b"/>
+    <circle cx="552" cy="258" r="9" fill="#0a3a52"/>
+    <circle cx="549" cy="255" r="3" fill="#bfe6fb"/>
+  </g>
+</svg>

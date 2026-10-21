@@ -22,9 +22,42 @@ const config: Config = {
           900: "#1e3a8a",
           950: "#172554",
         },
+        irillic: {
+          DEFAULT: "#0091D0",
+          50: "#e6f6fc",
+          100: "#ccecf9",
+          500: "#0091D0",
+          600: "#007ab0",
+          700: "#00628e",
+        },
+        motherson: {
+          DEFAULT: "#DA2128",
+          hover: "#120304",
+        },
+        charcoal: "#120304",
+        slate: {
+          body: "#555555",
+          heading: "#3A3A3C",
+          border: "#E3E3E3",
+        },
+        canvas: "#F8F9FA",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        jakarta: [
+          "Graphik",
+          "var(--font-jakarta)",
+          "Helvetica Neue",
+          "Arial",
+          "system-ui",
+          "sans-serif",
+        ],
+      },
+      borderRadius: {
+        pill: "9999px",
+      },
+      transitionTimingFunction: {
+        theme: "cubic-bezier(0.25, 0.8, 0.25, 1)",
       },
     },
   },

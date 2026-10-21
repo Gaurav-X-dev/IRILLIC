@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1a24"/><stop offset="1" stop-color="#05090d"/></linearGradient>
+  <filter id="g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="b"><feGaussianBlur stdDeviation="12"/></filter>
+  <radialGradient id="spill"><stop offset="0" stop-color="#0091D0" stop-opacity=".45"/><stop offset="1" stop-color="#0091D0" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="800" height="500" fill="url(#bg)"/>
+<circle cx="420" cy="170" r="360" fill="url(#spill)"/>
+<rect x="190" y="50" width="460" height="260" rx="10" fill="#1b0b0b" stroke="#2b3a46" stroke-width="6"/>
+<g transform="translate(190 50) scale(.575 .52)" filter="url(#g)"><path d="M 20 300 C 160 255, 260 335, 380 282 S 600 200, 790 232" fill="none" stroke="#2bff8a" stroke-width="15" stroke-linecap="round" opacity="1" /><path d="M 380 282 C 425 342, 470 382, 565 432" fill="none" stroke="#2bff8a" stroke-width="9" stroke-linecap="round" opacity="1" /><path d="M 232 300 C 252 222, 302 168, 362 112" fill="none" stroke="#2bff8a" stroke-width="8" stroke-linecap="round" opacity="1" /><path d="M 600 214 C 640 160, 690 118, 770 86" fill="none" stroke="#2bff8a" stroke-width="7" stroke-linecap="round" opacity="1" /><path d="M 120 282 C 132 352, 172 412, 245 482" fill="none" stroke="#2bff8a" stroke-width="7" stroke-linecap="round" opacity="1" /><path d="M 300 128 C 330 140, 345 160, 340 190" fill="none" stroke="#2bff8a" stroke-width="4" stroke-linecap="round" opacity="1" /><path d="M 690 120 C 700 160, 720 180, 760 190" fill="none" stroke="#2bff8a" stroke-width="4" stroke-linecap="round" opacity="1" /><path d="M 470 380 C 430 410, 400 440, 390 490" fill="none" stroke="#2bff8a" stroke-width="5" stroke-linecap="round" opacity="1" /><ellipse cx="524" cy="246" rx="34" ry="25" fill="#3dff96"/></g>
+<g filter="url(#b)" fill="#020406">
+  <ellipse cx="120" cy="470" rx="80" ry="90"/><ellipse cx="120" cy="360" rx="44" ry="52"/>
+  <ellipse cx="330" cy="500" rx="90" ry="90"/><ellipse cx="330" cy="390" rx="46" ry="54"/>
+  <ellipse cx="560" cy="490" rx="86" ry="90"/><ellipse cx="560" cy="380" rx="44" ry="52"/>
+  <ellipse cx="760" cy="470" rx="80" ry="90"/><ellipse cx="760" cy="360" rx="42" ry="50"/>
+</g>
+</svg>

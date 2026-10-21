@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <radialGradient id="t" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#f0b4a2"/><stop offset=".6" stop-color="#c9675c"/><stop offset="1" stop-color="#3a1414"/></radialGradient>
+  <filter id="g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <clipPath id="c"><circle cx="400" cy="250" r="230"/></clipPath>
+</defs>
+<rect width="800" height="500" fill="#030303"/>
+<g clip-path="url(#c)">
+  <rect width="800" height="500" fill="url(#t)"/>
+  <path d="M 150 300 C 300 260, 420 330, 640 250" stroke="#2bff8a" stroke-width="16" fill="none" filter="url(#g)"/>
+  <path d="M 380 290 C 400 360, 430 400, 470 470" stroke="#2bff8a" stroke-width="9" fill="none" filter="url(#g)"/>
+  <path d="M 820 120 L 560 230 L 548 216 L 800 96 Z" fill="#b9c1c8"/>
+  <path d="M 560 230 L 520 236 L 548 216 Z" fill="#e1e6ea"/>
+</g>
+<circle cx="400" cy="250" r="230" fill="none" stroke="#000" stroke-width="30" opacity=".5"/>
+</svg>
