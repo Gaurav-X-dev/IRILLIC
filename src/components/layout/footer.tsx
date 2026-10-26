@@ -1,8 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, FlaskConical, Globe, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
-import { CONTACT, FOOTER_COLUMNS, LEGAL_LINKS } from "@/config/navigation";
+import {
+  ArrowUpRight,
+  FlaskConical,
+  Globe,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+} from "lucide-react";
 import type { NavLink } from "@/types/site.types";
+import type { SiteChromeContent } from "@/validations/public-content.validation";
+import type { Branding } from "@/lib/branding";
 
 function FooterLink({ link }: { link: NavLink }) {
   const icon = <ArrowUpRight className="i" aria-hidden="true" />;
@@ -21,7 +30,14 @@ function FooterLink({ link }: { link: NavLink }) {
   );
 }
 
-export function Footer() {
+export function Footer({
+  branding,
+  footerColumns,
+  legalLinks,
+  contact,
+}: Pick<SiteChromeContent, "footerColumns" | "legalLinks" | "contact"> & {
+  branding: Branding;
+}) {
   const year = new Date().getFullYear();
 
   return (
@@ -32,10 +48,10 @@ export function Footer() {
           <div className="footer-brand-col">
             {/* Logo with official safe area (0.5 x height of "I") */}
             <div className="footer-logo-wrap">
-              <Link href="/" aria-label="Irillic home">
+              <Link href="/" aria-label={`${branding.siteName} home`}>
                 <Image
-                  src="/images/logo/irillic-logo-blue.png"
-                  alt="IRILLIC"
+                  src={branding.logoFooter}
+                  alt={branding.siteName}
                   className="footer-logo"
                   width={473}
                   height={139}
@@ -44,36 +60,54 @@ export function Footer() {
               </Link>
             </div>
 
-            <p className="footer-brand-desc">
-              Pioneering real-time ICG fluorescence and advanced laparoscopic imaging systems to elevate surgical
-              precision across India and global operating rooms.
-            </p>
+            <p className="footer-brand-desc">{branding.brandDescription}</p>
 
             <ul className="footer-trust-badges" aria-label="Accreditations">
-              <li className="trust-pill" title="Certified Quality Management System">
-                <ShieldCheck className="trust-icon" strokeWidth={2} aria-hidden="true" />
+              <li
+                className="trust-pill"
+                title="Certified Quality Management System"
+              >
+                <ShieldCheck
+                  className="trust-icon"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
                 <span>
                   <strong>ISO 13485:2016</strong> Certified
                 </span>
               </li>
-              <li className="trust-pill" title="Indigenous Medical Device Innovation">
-                <Globe className="trust-icon" strokeWidth={2} aria-hidden="true" />
+              <li
+                className="trust-pill"
+                title="Indigenous Medical Device Innovation"
+              >
+                <Globe
+                  className="trust-icon"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
                 <span>Make in India</span>
               </li>
-              <li className="trust-pill" title="Biotechnology Industry Research Assistance Council">
-                <FlaskConical className="trust-icon" strokeWidth={2} aria-hidden="true" />
+              <li
+                className="trust-pill"
+                title="Biotechnology Industry Research Assistance Council"
+              >
+                <FlaskConical
+                  className="trust-icon"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
                 <span>BIRAC Supported</span>
               </li>
             </ul>
 
             <p className="footer-group-tag">
-              <span className="group-dot" aria-hidden="true" /> An Enterprise in Surgical Photonics &amp; Medical
-              Technology
+              <span className="group-dot" aria-hidden="true" /> An Enterprise in
+              Surgical Photonics &amp; Medical Technology
             </p>
           </div>
 
           <nav className="footer__cols" aria-label="Footer">
-            {FOOTER_COLUMNS.map((column) => (
+            {footerColumns.map((column) => (
               <div key={column.title}>
                 <p className="footer__title">{column.title}</p>
                 <ul>
@@ -91,18 +125,20 @@ export function Footer() {
                 <p>
                   <MapPin className="i" aria-hidden="true" />
                   <span>
-                    <strong>{CONTACT.company}</strong>
-                    {CONTACT.address}
+                    <strong>{contact.company}</strong>
+                    {contact.address}
                   </span>
                 </p>
                 <p>
                   <Mail className="i" aria-hidden="true" />
-                  <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
                 </p>
-                <p>
-                  <Phone className="i" aria-hidden="true" />
-                  <a href={CONTACT.phoneHref}>{CONTACT.phone}</a>
-                </p>
+                {contact.phone ? (
+                  <p>
+                    <Phone className="i" aria-hidden="true" />
+                    <a href={contact.phoneHref}>{contact.phone}</a>
+                  </p>
+                ) : null}
               </address>
             </div>
           </nav>
@@ -123,13 +159,15 @@ export function Footer() {
       <div className="footer__legal">
         <div className="wrap footer__legal-inner">
           <ul>
-            {LEGAL_LINKS.map((link) => (
+            {legalLinks.map((link) => (
               <li key={link.label}>
                 <a href={link.href}>{link.label}</a>
               </li>
             ))}
           </ul>
-          <p>Copyright © {year} Irillic Private Limited. All rights reserved.</p>
+          <p>
+            Copyright © {year} {branding.legalName}. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

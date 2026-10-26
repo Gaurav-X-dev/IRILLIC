@@ -34,8 +34,19 @@ export function ProductGallery({ views }: { views: GalleryView[] }) {
       </div>
       <div className="gallery__thumbs" role="group" aria-label="Product views">
         {views.map((v, i) => (
-          <button key={v.src} type="button" aria-pressed={i === active} onClick={() => setActive(i)}>
-            <Image src={v.src} alt="" width={v.width} height={v.height} unoptimized />
+          <button
+            key={v.src}
+            type="button"
+            aria-pressed={i === active}
+            onClick={() => setActive(i)}
+          >
+            <Image
+              src={v.src}
+              alt=""
+              width={v.width}
+              height={v.height}
+              unoptimized
+            />
             <span>{v.label}</span>
           </button>
         ))}

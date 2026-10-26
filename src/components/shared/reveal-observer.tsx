@@ -11,9 +11,13 @@ export function RevealObserver() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>(".reveal:not(.is-visible)"));
+    const elements = Array.from(
+      document.querySelectorAll<HTMLElement>(".reveal:not(.is-visible)"),
+    );
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (reduced || !("IntersectionObserver" in window)) {
       elements.forEach((el) => el.classList.add("is-visible"));
       return;

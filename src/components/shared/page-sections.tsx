@@ -9,7 +9,13 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
     <nav className="crumbs" aria-label="Breadcrumb">
       <ol>
         {items.map((c) => (
-          <li key={c.label}>{c.href ? <Link href={c.href}>{c.label}</Link> : <span aria-current="page">{c.label}</span>}</li>
+          <li key={c.label}>
+            {c.href ? (
+              <Link href={c.href}>{c.label}</Link>
+            ) : (
+              <span aria-current="page">{c.label}</span>
+            )}
+          </li>
         ))}
       </ol>
     </nav>
@@ -56,7 +62,13 @@ interface SectionHeadProps {
   aside?: React.ReactNode;
 }
 
-export function SectionHead({ label, title, id, text, aside }: SectionHeadProps) {
+export function SectionHead({
+  label,
+  title,
+  id,
+  text,
+  aside,
+}: SectionHeadProps) {
   return (
     <header className={cn("sec-head reveal", aside && "sec-head--split")}>
       <div>
@@ -98,7 +110,8 @@ export function CtaBand({ title, text, primary, secondary }: CtaBandProps) {
           </Link>
           {secondary && (
             <Link className="link-pill link-pill--light" href={secondary.href}>
-              {secondary.label} <ArrowUpRight className="i" aria-hidden="true" />
+              {secondary.label}{" "}
+              <ArrowUpRight className="i" aria-hidden="true" />
             </Link>
           )}
         </div>

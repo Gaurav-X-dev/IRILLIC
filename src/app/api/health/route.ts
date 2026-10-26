@@ -26,7 +26,10 @@ export async function GET() {
         timestamp: new Date().toISOString(),
         database: {
           connected: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error:
+            process.env.NODE_ENV === "development" && error instanceof Error
+              ? error.message
+              : "Database unavailable",
         },
         environment: process.env.NODE_ENV,
       },

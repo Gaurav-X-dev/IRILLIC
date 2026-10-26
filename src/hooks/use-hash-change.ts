@@ -9,7 +9,9 @@ import { useEffect, useRef } from "react";
  * `hashchange`, so same-page deep links (e.g. /clinical-applications#gastro)
  * are picked up from the click instead.
  */
-export function useHashChange(onHash: (hash: string, initial: boolean) => void) {
+export function useHashChange(
+  onHash: (hash: string, initial: boolean) => void,
+) {
   const handler = useRef(onHash);
   handler.current = onHash;
 
@@ -26,7 +28,10 @@ export function useHashChange(onHash: (hash: string, initial: boolean) => void) 
     const timers: number[] = [];
     const onClick = (e: MouseEvent) => {
       const a = (e.target as Element | null)?.closest?.("a[href*='#']");
-      if (a) [0, 50, 150, 400].forEach((ms) => timers.push(window.setTimeout(check, ms)));
+      if (a)
+        [0, 50, 150, 400].forEach((ms) =>
+          timers.push(window.setTimeout(check, ms)),
+        );
     };
 
     emit(true);

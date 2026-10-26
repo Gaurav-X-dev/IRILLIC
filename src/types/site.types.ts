@@ -20,7 +20,7 @@ export interface MegaFeature {
 }
 
 export interface MegaSection {
-  key: "company" | "systems" | "clinical" | "global" | "media";
+  key: string;
   label: string;
   heading: string;
   intro: string;

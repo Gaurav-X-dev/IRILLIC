@@ -16,7 +16,9 @@ interface SiteChromeProps {
  */
 export function SiteChrome({ header, footer, children }: SiteChromeProps) {
   const pathname = usePathname();
-  const isAppRoute = APP_ROUTE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  const isAppRoute = APP_ROUTE_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 
   if (isAppRoute) return <>{children}</>;
 

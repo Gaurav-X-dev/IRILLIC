@@ -20,7 +20,12 @@ interface TabSetProps {
 }
 
 /** Accessible tabs (Theme 1 .tabs) with roving tabindex and arrow-key navigation. */
-export function TabSet({ items, label, className = "tabs", hashSync = false }: TabSetProps) {
+export function TabSet({
+  items,
+  label,
+  className = "tabs",
+  hashSync = false,
+}: TabSetProps) {
   const [selected, setSelected] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -30,8 +35,13 @@ export function TabSet({ items, label, className = "tabs", hashSync = false }: T
     const index = items.findIndex((item) => item.hash === hash);
     if (index === -1) return;
     setSelected(index);
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    rootRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    rootRef.current?.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      block: "start",
+    });
   });
 
   const select = (index: number, focus = false) => {
@@ -43,11 +53,16 @@ export function TabSet({ items, label, className = "tabs", hashSync = false }: T
     }
   };
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
     const last = items.length - 1;
     let next: number | null = null;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = index === last ? 0 : index + 1;
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = index === 0 ? last : index - 1;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown")
+      next = index === last ? 0 : index + 1;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+      next = index === 0 ? last : index - 1;
     else if (e.key === "Home") next = 0;
     else if (e.key === "End") next = last;
     if (next !== null) {

@@ -4,10 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, Equal, FileText, Plus, Search, Sparkle, X } from "lucide-react";
-import { MEGA_DOWNLOADS, MEGA_MENU, SEARCH_CHIPS, SEARCH_INDEX } from "@/config/navigation";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Equal,
+  FileText,
+  Plus,
+  Search,
+  Sparkle,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MegaSection, NavLink } from "@/types/site.types";
+import type { SiteChromeContent } from "@/validations/public-content.validation";
+import type { Branding } from "@/lib/branding";
 
 const DESKTOP_QUERY = "(min-width: 1101px)";
 
@@ -16,10 +26,20 @@ function pathOf(href: string): string {
 }
 
 function isSectionCurrent(section: MegaSection, pathname: string): boolean {
-  return section.match.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  return section.match.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
 }
 
-function MegaLink({ link, pathname, onNavigate }: { link: NavLink; pathname: string; onNavigate: () => void }) {
+function MegaLink({
+  link,
+  pathname,
+  onNavigate,
+}: {
+  link: NavLink;
+  pathname: string;
+  onNavigate: () => void;
+}) {
   if (link.external) {
     return (
       <a href={link.href} target="_blank" rel="noopener" onClick={onNavigate}>
@@ -30,13 +50,26 @@ function MegaLink({ link, pathname, onNavigate }: { link: NavLink; pathname: str
   }
   const current = !link.href.includes("#") && pathOf(link.href) === pathname;
   return (
-    <Link href={link.href} onClick={onNavigate} aria-current={current ? "page" : undefined}>
+    <Link
+      href={link.href}
+      onClick={onNavigate}
+      aria-current={current ? "page" : undefined}
+    >
       {link.label}
     </Link>
   );
 }
 
-export function Header() {
+export function Header({
+  branding,
+  megaMenu,
+  megaDownloads,
+  searchChips,
+  searchIndex,
+}: Pick<
+  SiteChromeContent,
+  "megaMenu" | "megaDownloads" | "searchChips" | "searchIndex"
+> & { branding: Branding }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -164,7 +197,10 @@ export function Header() {
     }, 220);
   };
 
-  const onItemBlur = (key: MegaSection["key"], e: React.FocusEvent<HTMLLIElement>) => {
+  const onItemBlur = (
+    key: MegaSection["key"],
+    e: React.FocusEvent<HTMLLIElement>,
+  ) => {
     if (!desktop) return;
     const next = e.relatedTarget as Node | null;
     if (next && !e.currentTarget.contains(next)) {
@@ -172,11 +208,16 @@ export function Header() {
     }
   };
 
-  const onTriggerKey = (key: MegaSection["key"], e: React.KeyboardEvent<HTMLButtonElement>) => {
+  const onTriggerKey = (
+    key: MegaSection["key"],
+    e: React.KeyboardEvent<HTMLButtonElement>,
+  ) => {
     if (e.key === "ArrowDown" && desktop) {
       e.preventDefault();
       openMega(key);
-      window.requestAnimationFrame(() => panelRefs.current[key]?.querySelector<HTMLAnchorElement>("a")?.focus());
+      window.requestAnimationFrame(() =>
+        panelRefs.current[key]?.querySelector<HTMLAnchorElement>("a")?.focus(),
+      );
     }
   };
 
@@ -191,11 +232,14 @@ export function Header() {
     const q = query.trim().toLowerCase();
     if (!q) return null;
     const terms = q.split(/\s+/);
-    return SEARCH_INDEX.filter((entry) => {
-      const hay = `${entry.title} ${entry.section} ${entry.keywords}`.toLowerCase();
-      return terms.every((term) => hay.includes(term));
-    }).slice(0, 6);
-  }, [query]);
+    return searchIndex
+      .filter((entry) => {
+        const hay =
+          `${entry.title} ${entry.section} ${entry.keywords}`.toLowerCase();
+        return terms.every((term) => hay.includes(term));
+      })
+      .slice(0, 6);
+  }, [query, searchIndex]);
 
   const onSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -210,15 +254,33 @@ export function Header() {
 
   return (
     <>
-      <header className={cn("hdr", scrolled && "is-scrolled", hidden && "is-hidden")} id="hdr">
+      <header
+        className={cn("hdr", scrolled && "is-scrolled", hidden && "is-hidden")}
+        id="hdr"
+      >
         <div className="hdr__bar">
-          <Link className="hdr__logo" href="/" aria-label="Irillic home">
-            <Image src="/images/logo/irillic-logo-blue.png" alt="Irillic" width={473} height={139} priority unoptimized />
+          <Link
+            className="hdr__logo"
+            href="/"
+            aria-label={`${branding.siteName} home`}
+          >
+            <Image
+              src={branding.logo}
+              alt={branding.siteName}
+              width={473}
+              height={139}
+              priority
+              unoptimized
+            />
           </Link>
 
-          <nav className={cn("nav", drawerOpen && "is-open")} id="nav" aria-label="Primary">
+          <nav
+            className={cn("nav", drawerOpen && "is-open")}
+            id="nav"
+            aria-label="Primary"
+          >
             <ul className="nav__list">
-              {MEGA_MENU.map((section) => {
+              {megaMenu.map((section) => {
                 const current = isSectionCurrent(section, pathname);
                 const expanded = openKey === section.key;
                 return (
@@ -244,8 +306,11 @@ export function Header() {
                       }}
                       onKeyDown={(e) => onTriggerKey(section.key, e)}
                     >
-                      {section.label} <Plus className="i nav__plus" aria-hidden="true" />
-                      {current && <span className="sr-only">(current section)</span>}
+                      {section.label}{" "}
+                      <Plus className="i nav__plus" aria-hidden="true" />
+                      {current && (
+                        <span className="sr-only">(current section)</span>
+                      )}
                     </button>
 
                     <div
@@ -268,9 +333,15 @@ export function Header() {
                             className="pill"
                             href={section.cta.href}
                             onClick={closeAll}
-                            aria-current={!section.cta.href.includes("#") && section.cta.href === pathname ? "page" : undefined}
+                            aria-current={
+                              !section.cta.href.includes("#") &&
+                              section.cta.href === pathname
+                                ? "page"
+                                : undefined
+                            }
                           >
-                            {section.cta.label} <ArrowRight className="i" aria-hidden="true" />
+                            {section.cta.label}{" "}
+                            <ArrowRight className="i" aria-hidden="true" />
                           </Link>
                         </div>
                         {section.columns.map((column) => (
@@ -279,30 +350,48 @@ export function Header() {
                             <ul className="mega__links">
                               {column.links.map((link) => (
                                 <li key={link.label}>
-                                  <MegaLink link={link} pathname={pathname} onNavigate={closeAll} />
+                                  <MegaLink
+                                    link={link}
+                                    pathname={pathname}
+                                    onNavigate={closeAll}
+                                  />
                                 </li>
                               ))}
                             </ul>
                           </div>
                         ))}
-                        <Link className="mega__feature" href={section.feature.href} onClick={closeAll}>
+                        <Link
+                          className="mega__feature"
+                          href={section.feature.href}
+                          onClick={closeAll}
+                        >
                           <span className="mega__feature-img">
-                            <Image src={section.feature.image} alt="" width={800} height={500} unoptimized />
+                            <Image
+                              src={section.feature.image}
+                              alt=""
+                              width={800}
+                              height={500}
+                              unoptimized
+                            />
                           </span>
                           <span className="label">{section.feature.label}</span>
-                          <span className="mega__feature-title">{section.feature.title}</span>
+                          <span className="mega__feature-title">
+                            {section.feature.title}
+                          </span>
                           <span className="link">
-                            {section.feature.cta} <ArrowRight className="i" aria-hidden="true" />
+                            {section.feature.cta}{" "}
+                            <ArrowRight className="i" aria-hidden="true" />
                           </span>
                         </Link>
                       </div>
                       <div className="mega__ifu">
                         <p className="label">{section.downloadsLabel}</p>
                         <ul>
-                          {MEGA_DOWNLOADS.map((d) => (
+                          {megaDownloads.map((d) => (
                             <li key={d.label}>
                               <Link href={d.href} onClick={closeAll}>
-                                <FileText className="i" aria-hidden="true" /> {d.label} <span>PDF</span>
+                                <FileText className="i" aria-hidden="true" />{" "}
+                                {d.label} <span>PDF</span>
                               </Link>
                             </li>
                           ))}
@@ -356,15 +445,30 @@ export function Header() {
                 setHidden(false);
               }}
             >
-              {drawerOpen ? <X className="i" aria-hidden="true" /> : <Equal className="i" aria-hidden="true" />}
+              {drawerOpen ? (
+                <X className="i" aria-hidden="true" />
+              ) : (
+                <Equal className="i" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
 
         {/* Search panel */}
-        <div className="search" id="search" role="dialog" aria-modal="true" aria-label="Search the site" hidden={!searchOpen}>
+        <div
+          className="search"
+          id="search"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Search the site"
+          hidden={!searchOpen}
+        >
           <div className="search__inner">
-            <form className="search__form" role="search" onSubmit={onSearchSubmit}>
+            <form
+              className="search__form"
+              role="search"
+              onSubmit={onSearchSubmit}
+            >
               <Search className="i" aria-hidden="true" />
               <label className="sr-only" htmlFor="search-input">
                 Search Irillic
@@ -393,7 +497,7 @@ export function Header() {
             <div className="search__suggest" hidden={results !== null}>
               <p className="label">Popular searches</p>
               <div className="search__chips">
-                {SEARCH_CHIPS.map((chip) => (
+                {searchChips.map((chip) => (
                   <button
                     key={chip.query}
                     type="button"
@@ -410,7 +514,9 @@ export function Header() {
             <ul className="search__results" aria-live="polite">
               {results && results.length === 0 && (
                 <li className="search__empty">
-                  No results for &ldquo;{query.trim()}&rdquo;. Try &ldquo;ICG&rdquo;, &ldquo;IFU&rdquo; or &ldquo;laparoscopic&rdquo;.
+                  No results for &ldquo;{query.trim()}&rdquo;. Try
+                  &ldquo;ICG&rdquo;, &ldquo;IFU&rdquo; or
+                  &ldquo;laparoscopic&rdquo;.
                 </li>
               )}
               {results?.map((entry) => (

@@ -35,7 +35,9 @@ export function SubNav({ items, label = "On this page" }: SubNavProps) {
   useEffect(() => {
     const list = listRef.current;
     const link = active ? linkRefs.current[active] : null;
-    if (list && link) list.scrollLeft = link.offsetLeft - list.clientWidth / 2 + link.clientWidth / 2;
+    if (list && link)
+      list.scrollLeft =
+        link.offsetLeft - list.clientWidth / 2 + link.clientWidth / 2;
   }, [active]);
 
   return (

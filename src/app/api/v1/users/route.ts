@@ -1,51 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/db";
+import { auditLogs } from "@/db/schema";
 import { userService } from "@/services/user.service";
-import { createUserSchema } from "@/validations/user.validation";
-import { ApiResponse } from "@/types/api.types";
+import type { ApiResponse } from "@/types/api.types";
+import { authorizeAdminApi } from "@/lib/admin-api";
+import { apiError, clientIp } from "@/lib/api";
+import { createContentReaderSchema } from "@/validations/user.validation";
 
-// GET /api/v1/users - Get all users
 export async function GET() {
   try {
-    const users = await userService.getAll();
-
+    const auth = await authorizeAdminApi({ permission: "users:manage" });
+    if (auth.response) return auth.response;
     return NextResponse.json<ApiResponse>({
       success: true,
-      data: users,
+      data: await userService.getAll(),
       message: "Users fetched successfully",
     });
   } catch (error) {
-    return NextResponse.json<ApiResponse>(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 },
-    );
+    return apiError(error, "Users could not be loaded");
   }
 }
 
-// POST /api/v1/users - Create a new user
+/** Additional accounts are deliberately fixed to the Content Reader role. */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const validated = createUserSchema.parse(body);
-    const user = await userService.create(validated);
-
+    const auth = await authorizeAdminApi({ permission: "users:manage" });
+    if (auth.response || !auth.session) return auth.response;
+    const input = createContentReaderSchema.parse(await request.json());
+    const created = await userService.createContentReader(input);
+    await db.insert(auditLogs).values({
+      userId: auth.session.userId,
+      action: "create_content_reader",
+      entityType: "user",
+      entityId: created.id,
+      changes: { email: created.email, role: created.role },
+      ipAddress: clientIp(request),
+    });
     return NextResponse.json<ApiResponse>(
       {
         success: true,
-        data: user,
-        message: "User created successfully",
+        data: created,
+        message: "Content Reader created successfully",
       },
       { status: 201 },
     );
   } catch (error) {
-    return NextResponse.json<ApiResponse>(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 400 },
-    );
+    return apiError(error, "Content Reader could not be created");
   }
 }

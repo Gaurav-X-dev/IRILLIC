@@ -4,7 +4,13 @@ import { useRef, useState } from "react";
 import { ArrowRight, Check, X } from "lucide-react";
 import type { Leader } from "@/types/site.types";
 
-function LeaderCard({ leader, onOpen }: { leader: Leader; onOpen: (leader: Leader, button: HTMLButtonElement) => void }) {
+function LeaderCard({
+  leader,
+  onOpen,
+}: {
+  leader: Leader;
+  onOpen: (leader: Leader, button: HTMLButtonElement) => void;
+}) {
   return (
     <article className="leader reveal">
       <span className="leader__mono" aria-hidden="true">
@@ -13,7 +19,11 @@ function LeaderCard({ leader, onOpen }: { leader: Leader; onOpen: (leader: Leade
       <p className="label">{leader.group}</p>
       <h3 className="leader__role">{leader.role}</h3>
       <p className="leader__fn">{leader.focusLine}</p>
-      <button className="link leader__btn" type="button" onClick={(e) => onOpen(leader, e.currentTarget)}>
+      <button
+        className="link leader__btn"
+        type="button"
+        onClick={(e) => onOpen(leader, e.currentTarget)}
+      >
         View profile <ArrowRight className="i" aria-hidden="true" />
       </button>
     </article>
@@ -59,7 +69,12 @@ export function LeadersGrid({ leaders }: { leaders: Leader[] }) {
           if (e.target === dialogRef.current) dialogRef.current?.close();
         }}
       >
-        <button className="modal__close" type="button" aria-label="Close profile" onClick={() => dialogRef.current?.close()}>
+        <button
+          className="modal__close"
+          type="button"
+          aria-label="Close profile"
+          onClick={() => dialogRef.current?.close()}
+        >
           <X className="i" aria-hidden="true" />
         </button>
         {active && (

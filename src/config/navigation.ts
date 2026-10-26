@@ -17,7 +17,14 @@ export const EXTERNAL = {
 } as const;
 
 /** Routes that render the application shell instead of the marketing site */
-export const APP_ROUTE_PREFIXES = ["/dashboard", "/login", "/register"];
+export const APP_ROUTE_PREFIXES = [
+  "/admin",
+  "/dashboard",
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/register",
+];
 
 export const MEGA_MENU: MegaSection[] = [
   {
@@ -33,7 +40,10 @@ export const MEGA_MENU: MegaSection[] = [
         links: [
           { label: "Our Story", href: "/about-us#story" },
           { label: "The Motherson Synergy", href: "/about-us#synergy" },
-          { label: "Leadership & Advisory Board", href: "/about-us#leadership" },
+          {
+            label: "Leadership & Advisory Board",
+            href: "/about-us#leadership",
+          },
           { label: "Our Identity", href: "/about-us#identity" },
         ],
       },
@@ -68,17 +78,32 @@ export const MEGA_MENU: MegaSection[] = [
       {
         title: "Imaging systems",
         links: [
-          { label: "Irillic nm Fluorescence Imaging System", href: "/products#nm" },
-          { label: "Irillic L nm Laparoscopic Imaging System", href: "/products/irillic-l-nm" },
+          {
+            label: "Irillic nm Fluorescence Imaging System",
+            href: "/products#nm",
+          },
+          {
+            label: "Irillic L nm Laparoscopic Imaging System",
+            href: "/products/irillic-l-nm",
+          },
           { label: "Compare systems", href: "/products#matrix" },
         ],
       },
       {
         title: "Technology",
         links: [
-          { label: "Optical Performance", href: "/products/irillic-l-nm#specs" },
-          { label: "Clinical Workflow", href: "/products/irillic-l-nm#workflow" },
-          { label: "OR Compatibility", href: "/products/irillic-l-nm#compatibility" },
+          {
+            label: "Optical Performance",
+            href: "/products/irillic-l-nm#specs",
+          },
+          {
+            label: "Clinical Workflow",
+            href: "/products/irillic-l-nm#workflow",
+          },
+          {
+            label: "OR Compatibility",
+            href: "/products/irillic-l-nm#compatibility",
+          },
           { label: "Technical Documentation", href: "/clinical-resources#ifu" },
         ],
       },
@@ -104,10 +129,22 @@ export const MEGA_MENU: MegaSection[] = [
       {
         title: "Specialties",
         links: [
-          { label: "Surgical Oncology", href: "/clinical-applications#oncology" },
-          { label: "Plastic & Reconstructive", href: "/clinical-applications#reconstructive" },
-          { label: "Gastrointestinal Surgery", href: "/clinical-applications#gastro" },
-          { label: "Urology & Gynaecology", href: "/clinical-applications#urology" },
+          {
+            label: "Surgical Oncology",
+            href: "/clinical-applications#oncology",
+          },
+          {
+            label: "Plastic & Reconstructive",
+            href: "/clinical-applications#reconstructive",
+          },
+          {
+            label: "Gastrointestinal Surgery",
+            href: "/clinical-applications#gastro",
+          },
+          {
+            label: "Urology & Gynaecology",
+            href: "/clinical-applications#urology",
+          },
         ],
       },
       {
@@ -151,7 +188,11 @@ export const MEGA_MENU: MegaSection[] = [
         links: [
           { label: "The Motherson Synergy", href: "/about-us#synergy" },
           { label: "Become a Partner", href: "/contact#enquiries" },
-          { label: "Motherson Health & Medical", href: EXTERNAL.mothersonHealth, external: true },
+          {
+            label: "Motherson Health & Medical",
+            href: EXTERNAL.mothersonHealth,
+            external: true,
+          },
         ],
       },
     ],
@@ -184,7 +225,11 @@ export const MEGA_MENU: MegaSection[] = [
       {
         title: "Investors",
         links: [
-          { label: "Motherson Group", href: EXTERNAL.mothersonGroup, external: true },
+          {
+            label: "Motherson Group",
+            href: EXTERNAL.mothersonGroup,
+            external: true,
+          },
           { label: "Group Partnership", href: "/about-us#synergy" },
           { label: "Company Policies", href: "/about-us#quality" },
         ],
@@ -203,8 +248,14 @@ export const MEGA_MENU: MegaSection[] = [
 ];
 
 export const MEGA_DOWNLOADS: NavLink[] = [
-  { label: "Irillic nm: Instructions for Use", href: "/clinical-resources#ifu" },
-  { label: "Irillic L nm: Instructions for Use", href: "/clinical-resources#ifu" },
+  {
+    label: "Irillic nm: Instructions for Use",
+    href: "/clinical-resources#ifu",
+  },
+  {
+    label: "Irillic L nm: Instructions for Use",
+    href: "/clinical-resources#ifu",
+  },
   { label: "Product Spec Sheets", href: "/clinical-resources#ifu" },
 ];
 
@@ -217,29 +268,150 @@ export const SEARCH_CHIPS: { label: string; query: string }[] = [
 ];
 
 export const SEARCH_INDEX: SearchEntry[] = [
-  { title: "About Irillic", section: "Company", href: "/about-us", keywords: "company about story vision who we are" },
-  { title: "Our Identity: Vaastu-compliant logo", section: "Company", href: "/about-us#identity", keywords: "brand logo vaastu identity design" },
-  { title: "The Motherson Synergy", section: "Company", href: "/about-us#synergy", keywords: "motherson group samvardhana engineering manufacturing supply chain" },
-  { title: "Leadership & Scientific Advisory Board", section: "Company", href: "/about-us#leadership", keywords: "leadership team ceo cto advisors board" },
-  { title: "Quality & Certifications", section: "Company", href: "/about-us#quality", keywords: "iso 13485 cdsco birac make in india quality regulatory compliance certified" },
-  { title: "Products: all systems", section: "Innovations & Systems", href: "/products", keywords: "products systems portfolio compare" },
-  { title: "Irillic nm Fluorescence Imaging System", section: "Innovations & Systems", href: "/products#nm", keywords: "nm open surgery handheld icg fluorescence camera portable cart" },
-  { title: "Irillic L nm Laparoscopic Imaging System", section: "Innovations & Systems", href: "/products/irillic-l-nm", keywords: "l nm laparoscopic minimally invasive endoscopic 4k full hd nir overlay" },
-  { title: "Feature comparison matrix", section: "Innovations & Systems", href: "/products#matrix", keywords: "compare matrix wavelength sensor display modes certifications" },
-  { title: "L nm specifications", section: "Irillic L nm", href: "/products/irillic-l-nm#specs", keywords: "specs optical camera light source ergonomics sterilization reprocessing" },
-  { title: "Clinical workflow", section: "Irillic L nm", href: "/products/irillic-l-nm#workflow", keywords: "workflow icg administration nir excitation perfusion" },
-  { title: "OR compatibility", section: "Irillic L nm", href: "/products/irillic-l-nm#compatibility", keywords: "compatibility laparoscopy stack boom integration" },
-  { title: "Surgical Oncology", section: "Clinical Applications", href: "/clinical-applications#oncology", keywords: "oncology cancer sentinel lymph node sln margin breast" },
-  { title: "Plastic & Reconstructive Surgery", section: "Clinical Applications", href: "/clinical-applications#reconstructive", keywords: "plastic reconstructive flap perfusion microvascular" },
-  { title: "Gastrointestinal Surgery", section: "Clinical Applications", href: "/clinical-applications#gastro", keywords: "gastrointestinal gi colorectal anastomosis leak biliary cholangiography" },
-  { title: "Urology & Gynaecology", section: "Clinical Applications", href: "/clinical-applications#urology", keywords: "urology gynaecology gynecology ureter endometrial cervical lymphatic" },
-  { title: "IFU downloads", section: "Clinical Resources", href: "/clinical-resources#ifu", keywords: "ifu instructions for use pdf download manual spec sheet" },
-  { title: "Clinical studies", section: "Clinical Resources", href: "/clinical-resources#studies", keywords: "clinical studies papers research evidence pubmed pillar fires" },
-  { title: "Whitepapers", section: "Clinical Resources", href: "/clinical-resources#whitepapers", keywords: "whitepaper guide programme principles" },
-  { title: "Video guides", section: "Clinical Resources", href: "/clinical-resources#videos", keywords: "video training setup guide" },
-  { title: "Request an OR demonstration", section: "Contact", href: "/contact#form", keywords: "demo demonstration book request or hospital" },
-  { title: "Bangalore headquarters", section: "Contact", href: "/contact#hq", keywords: "contact address bangalore bengaluru office phone email map" },
-  { title: "Global network", section: "Contact", href: "/contact#network", keywords: "global presence network motherson health medical partners" },
+  {
+    title: "About Irillic",
+    section: "Company",
+    href: "/about-us",
+    keywords: "company about story vision who we are",
+  },
+  {
+    title: "Our Identity: Vaastu-compliant logo",
+    section: "Company",
+    href: "/about-us#identity",
+    keywords: "brand logo vaastu identity design",
+  },
+  {
+    title: "The Motherson Synergy",
+    section: "Company",
+    href: "/about-us#synergy",
+    keywords:
+      "motherson group samvardhana engineering manufacturing supply chain",
+  },
+  {
+    title: "Leadership & Scientific Advisory Board",
+    section: "Company",
+    href: "/about-us#leadership",
+    keywords: "leadership team ceo cto advisors board",
+  },
+  {
+    title: "Quality & Certifications",
+    section: "Company",
+    href: "/about-us#quality",
+    keywords:
+      "iso 13485 cdsco birac make in india quality regulatory compliance certified",
+  },
+  {
+    title: "Products: all systems",
+    section: "Innovations & Systems",
+    href: "/products",
+    keywords: "products systems portfolio compare",
+  },
+  {
+    title: "Irillic nm Fluorescence Imaging System",
+    section: "Innovations & Systems",
+    href: "/products#nm",
+    keywords: "nm open surgery handheld icg fluorescence camera portable cart",
+  },
+  {
+    title: "Irillic L nm Laparoscopic Imaging System",
+    section: "Innovations & Systems",
+    href: "/products/irillic-l-nm",
+    keywords:
+      "l nm laparoscopic minimally invasive endoscopic 4k full hd nir overlay",
+  },
+  {
+    title: "Feature comparison matrix",
+    section: "Innovations & Systems",
+    href: "/products#matrix",
+    keywords: "compare matrix wavelength sensor display modes certifications",
+  },
+  {
+    title: "L nm specifications",
+    section: "Irillic L nm",
+    href: "/products/irillic-l-nm#specs",
+    keywords:
+      "specs optical camera light source ergonomics sterilization reprocessing",
+  },
+  {
+    title: "Clinical workflow",
+    section: "Irillic L nm",
+    href: "/products/irillic-l-nm#workflow",
+    keywords: "workflow icg administration nir excitation perfusion",
+  },
+  {
+    title: "OR compatibility",
+    section: "Irillic L nm",
+    href: "/products/irillic-l-nm#compatibility",
+    keywords: "compatibility laparoscopy stack boom integration",
+  },
+  {
+    title: "Surgical Oncology",
+    section: "Clinical Applications",
+    href: "/clinical-applications#oncology",
+    keywords: "oncology cancer sentinel lymph node sln margin breast",
+  },
+  {
+    title: "Plastic & Reconstructive Surgery",
+    section: "Clinical Applications",
+    href: "/clinical-applications#reconstructive",
+    keywords: "plastic reconstructive flap perfusion microvascular",
+  },
+  {
+    title: "Gastrointestinal Surgery",
+    section: "Clinical Applications",
+    href: "/clinical-applications#gastro",
+    keywords:
+      "gastrointestinal gi colorectal anastomosis leak biliary cholangiography",
+  },
+  {
+    title: "Urology & Gynaecology",
+    section: "Clinical Applications",
+    href: "/clinical-applications#urology",
+    keywords:
+      "urology gynaecology gynecology ureter endometrial cervical lymphatic",
+  },
+  {
+    title: "IFU downloads",
+    section: "Clinical Resources",
+    href: "/clinical-resources#ifu",
+    keywords: "ifu instructions for use pdf download manual spec sheet",
+  },
+  {
+    title: "Clinical studies",
+    section: "Clinical Resources",
+    href: "/clinical-resources#studies",
+    keywords: "clinical studies papers research evidence pubmed pillar fires",
+  },
+  {
+    title: "Whitepapers",
+    section: "Clinical Resources",
+    href: "/clinical-resources#whitepapers",
+    keywords: "whitepaper guide programme principles",
+  },
+  {
+    title: "Video guides",
+    section: "Clinical Resources",
+    href: "/clinical-resources#videos",
+    keywords: "video training setup guide",
+  },
+  {
+    title: "Request an OR demonstration",
+    section: "Contact",
+    href: "/contact#form",
+    keywords: "demo demonstration book request or hospital",
+  },
+  {
+    title: "Bangalore headquarters",
+    section: "Contact",
+    href: "/contact#hq",
+    keywords: "contact address bangalore bengaluru office phone email map",
+  },
+  {
+    title: "Global network",
+    section: "Contact",
+    href: "/contact#network",
+    keywords: "global presence network motherson health medical partners",
+  },
 ];
 
 export const FOOTER_COLUMNS: { title: string; links: NavLink[] }[] = [
@@ -282,7 +454,8 @@ export const LEGAL_LINKS: NavLink[] = [
 
 export const CONTACT = {
   company: "Irillic Private Limited",
-  address: "3rd Floor, Kalyani Neptune, Bannerghatta Road, Bangalore – 560076, India",
+  address:
+    "3rd Floor, Kalyani Neptune, Bannerghatta Road, Bangalore – 560076, India",
   email: "info@irillic.com",
   phone: "+91 7624973228",
   phoneHref: "tel:+917624973228",

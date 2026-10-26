@@ -26,6 +26,11 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+/.local-postgres/
+
+# runtime uploads (avatars, documents) — user data, not source
+/public/uploads/*
+!/public/uploads/.gitkeep
 
 # vercel
 .vercel

@@ -20,7 +20,8 @@ const variantClass: Record<Variant, string> = {
 };
 
 function sizeClass(variant: Variant, size: Size): string {
-  if (variant === "pill") return size === "sm" ? "pill--sm" : size === "lg" ? "pill--lg" : "";
+  if (variant === "pill")
+    return size === "sm" ? "pill--sm" : size === "lg" ? "pill--lg" : "";
   return size === "lg" ? "link-pill--lg" : "";
 }
 
@@ -41,8 +42,7 @@ interface PillOptions {
 }
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    PillOptions {}
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, PillOptions {}
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -68,14 +68,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       {...props}
     >
       {isLoading ? "Sending…" : children}
-      {!isLoading && (icon === undefined ? <DefaultIcon variant={variant} /> : icon)}
+      {!isLoading &&
+        (icon === undefined ? <DefaultIcon variant={variant} /> : icon)}
     </button>
   ),
 );
 Button.displayName = "Button";
 
 export interface ButtonLinkProps
-  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
+  extends
+    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
     Omit<PillOptions, "isLoading"> {
   href: string;
   /** Opens in a new tab with rel="noopener" and an accessible hint */
@@ -83,8 +85,24 @@ export interface ButtonLinkProps
 }
 
 const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
-  ({ className, variant = "pill", size = "md", icon, href, external, children, ...props }, ref) => {
-    const classes = cn(variantClass[variant], sizeClass(variant, size), className);
+  (
+    {
+      className,
+      variant = "pill",
+      size = "md",
+      icon,
+      href,
+      external,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const classes = cn(
+      variantClass[variant],
+      sizeClass(variant, size),
+      className,
+    );
     const content = (
       <>
         {children}
@@ -94,7 +112,14 @@ const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
     );
     if (external) {
       return (
-        <a ref={ref} href={href} target="_blank" rel="noopener" className={classes} {...props}>
+        <a
+          ref={ref}
+          href={href}
+          target="_blank"
+          rel="noopener"
+          className={classes}
+          {...props}
+        >
           {content}
         </a>
       );

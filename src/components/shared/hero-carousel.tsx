@@ -3,7 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Pause,
+  Play,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface HeroSlide {
@@ -55,7 +61,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       onMouseLeave={() => setHovering(false)}
       onFocus={() => setFocusInside(true)}
       onBlur={(e) => {
-        if (!rootRef.current?.contains(e.relatedTarget as Node | null)) setFocusInside(false);
+        if (!rootRef.current?.contains(e.relatedTarget as Node | null))
+          setFocusInside(false);
       }}
       onKeyDown={(e) => {
         if (e.key === "ArrowRight") go(current + 1);
@@ -102,7 +109,8 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 <span className="hero__rule" aria-hidden="true" />
                 <p className="hero__text">{slide.text}</p>
                 <Link className="pill" href={slide.cta.href}>
-                  {slide.cta.label} <ArrowRight className="i" aria-hidden="true" />
+                  {slide.cta.label}{" "}
+                  <ArrowRight className="i" aria-hidden="true" />
                 </Link>
               </div>
             </article>
@@ -134,7 +142,12 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
           ))}
         </div>
         <div className="hero__buttons">
-          <button className="hero__btn" type="button" aria-label="Previous slide" onClick={() => go(current - 1)}>
+          <button
+            className="hero__btn"
+            type="button"
+            aria-label="Previous slide"
+            onClick={() => go(current - 1)}
+          >
             <ChevronLeft className="i" aria-hidden="true" />
           </button>
           <button
@@ -152,7 +165,12 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               <Pause className="i" aria-hidden="true" />
             )}
           </button>
-          <button className="hero__btn" type="button" aria-label="Next slide" onClick={() => go(current + 1)}>
+          <button
+            className="hero__btn"
+            type="button"
+            aria-label="Next slide"
+            onClick={() => go(current + 1)}
+          >
             <ChevronRight className="i" aria-hidden="true" />
           </button>
         </div>

@@ -14,7 +14,13 @@ interface CardProps extends React.HTMLAttributes<HTMLElement> {
   children: React.ReactNode;
 }
 
-export function Card({ as: Tag = "div", interactive = false, className, children, ...props }: CardProps) {
+export function Card({
+  as: Tag = "div",
+  interactive = false,
+  className,
+  children,
+  ...props
+}: CardProps) {
   return (
     <Tag
       className={cn(
@@ -30,7 +36,11 @@ export function Card({ as: Tag = "div", interactive = false, className, children
   );
 }
 
-export function CardHeader({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function CardHeader({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn("mb-4 space-y-1", className)} {...props}>
       {children}
@@ -38,15 +48,29 @@ export function CardHeader({ className, children, ...props }: React.HTMLAttribut
   );
 }
 
-export function CardTitle({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+export function CardTitle({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h3 className={cn("text-[19px] font-normal leading-snug text-charcoal", className)} {...props}>
+    <h3
+      className={cn(
+        "text-[19px] font-normal leading-snug text-charcoal",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h3>
   );
 }
 
-export function CardContent({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function CardContent({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={cn("text-[14.5px] text-slate-body", className)} {...props}>
       {children}

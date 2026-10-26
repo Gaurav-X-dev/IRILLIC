@@ -10,7 +10,11 @@ interface CounterProps {
 }
 
 /** Counts up (easeOutQuart) the first time it scrolls into view. */
-export function Counter({ target, plain = false, duration = 2200 }: CounterProps) {
+export function Counter({
+  target,
+  plain = false,
+  duration = 2200,
+}: CounterProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const [value, setValue] = useState(0);
   const format = (n: number) => (plain ? String(n) : n.toLocaleString("en-IN"));
@@ -18,7 +22,10 @@ export function Counter({ target, plain = false, duration = 2200 }: CounterProps
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
       setValue(target);
       return;
     }
