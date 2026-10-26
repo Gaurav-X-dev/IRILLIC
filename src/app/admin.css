@@ -1,0 +1,773 @@
+/* Administration panel styles. Imported by the dashboard and auth
+   layouts only, so the public website never downloads them. */
+
+/* Keep public editorial typography from leaking into the administration UI. */
+.admin-ui,
+.admin-ui button,
+.admin-ui input,
+.admin-ui select,
+.admin-ui textarea,
+.admin-ui h1,
+.admin-ui h2,
+.admin-ui h3,
+.admin-ui h4,
+.admin-ui p,
+.admin-ui a,
+.admin-ui table {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+.admin-ui {
+  color: rgb(var(--adc-ink));
+  font-size: 14px;
+  line-height: 1.5;
+}
+.admin-ui label > span,
+.admin-ui fieldset > legend {
+  font-size: 12px;
+  font-weight: 650;
+  color: rgb(var(--adc-muted));
+}
+.admin-ui input:not([type="checkbox"]):not([type="radio"]),
+.admin-ui select {
+  min-height: 44px;
+  font-size: 14px;
+}
+.admin-ui textarea {
+  font-size: 14px;
+  line-height: 1.55;
+}
+.admin-ui button {
+  font-weight: 600;
+}
+
+/* =========================================================================
+   Administration panel theming
+
+   The admin UI is authored with light Tailwind utilities. Rather than
+   rewriting every component, the dark theme remaps the surface, border and
+   text utilities the panel actually uses. Scoping each override under
+   .admin-ui[data-admin-theme="dark"] keeps specificity above the plain
+   utility class, so no !important is required, and leaves the public
+   marketing site completely untouched.
+   ========================================================================= */
+.admin-ui {
+  --ad-canvas: #f6f7fb;
+  --ad-surface: #ffffff;
+  --ad-surface-2: #f8fafc;
+  --ad-surface-3: #f1f5f9;
+  --ad-border: #e2e8f0;
+  --ad-border-soft: #eef2f6;
+  --ad-text: #0f172a;
+  --ad-text-muted: #64748b;
+  --ad-text-faint: #94a3b8;
+  --ad-accent: #0091d0;
+  --ad-shadow-lg: 0 10px 30px -12px rgb(15 23 42 / 22%);
+  color-scheme: light;
+}
+
+.admin-ui[data-admin-theme="dark"] {
+  --ad-canvas: #060b18;
+  --ad-surface: #0d152b;
+  --ad-surface-2: #111c38;
+  --ad-surface-3: #16233f;
+  --ad-border: #22304f;
+  --ad-border-soft: #1a2742;
+  --ad-text: #e8eefc;
+  --ad-text-muted: #94a6c8;
+  --ad-text-faint: #64789e;
+  --ad-accent: #38bdf8;
+  --ad-shadow-lg: 0 24px 50px -24px rgb(0 0 0 / 80%);
+  color-scheme: dark;
+  color: var(--ad-text);
+}
+
+/* ---- canvases -------------------------------------------------------- */
+.admin-ui[data-admin-theme="dark"] .bg-\[\#f6f7fb\],
+.admin-ui[data-admin-theme="dark"] .bg-\[\#f3f6f8\],
+.admin-ui[data-admin-theme="dark"] .bg-\[\#f8f9fa\] {
+  background-color: var(--ad-canvas);
+}
+
+/* ---- raised surfaces ------------------------------------------------- */
+.admin-ui[data-admin-theme="dark"] .bg-white {
+  background-color: var(--ad-surface);
+}
+.admin-ui[data-admin-theme="dark"] .bg-white\/55 {
+  background-color: color-mix(in srgb, var(--ad-surface) 55%, transparent);
+}
+.admin-ui[data-admin-theme="dark"] .bg-slate-50,
+.admin-ui[data-admin-theme="dark"] .bg-slate-50\/70,
+.admin-ui[data-admin-theme="dark"] .bg-slate-50\/60 {
+  background-color: var(--ad-surface-2);
+}
+.admin-ui[data-admin-theme="dark"] .hover\:bg-slate-50:hover,
+.admin-ui[data-admin-theme="dark"] .hover\:bg-slate-50\/70:hover,
+.admin-ui[data-admin-theme="dark"] .hover\:bg-\[\#f8f9fa\]:hover {
+  background-color: var(--ad-surface-3);
+}
+
+/* ---- tinted status surfaces ------------------------------------------ */
+.admin-ui[data-admin-theme="dark"] .bg-cyan-50,
+.admin-ui[data-admin-theme="dark"] .bg-\[\#e6f6fc\] {
+  background-color: color-mix(in srgb, #0ea5e9 18%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .hover\:bg-cyan-50:hover,
+.admin-ui[data-admin-theme="dark"] .hover\:bg-cyan-50\/50:hover {
+  background-color: color-mix(in srgb, #0ea5e9 24%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .bg-blue-50 {
+  background-color: color-mix(in srgb, #2563eb 20%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .bg-emerald-50 {
+  background-color: color-mix(in srgb, #10b981 18%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .bg-amber-50 {
+  background-color: color-mix(in srgb, #f59e0b 18%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .bg-red-50,
+.admin-ui[data-admin-theme="dark"] .hover\:bg-red-50:hover {
+  background-color: color-mix(in srgb, #ef4444 20%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .bg-orange-50 {
+  background-color: color-mix(in srgb, #f97316 18%, var(--ad-surface));
+}
+
+/* ---- borders --------------------------------------------------------- */
+.admin-ui[data-admin-theme="dark"] .border-slate-200,
+.admin-ui[data-admin-theme="dark"] .border-slate-200\/80,
+.admin-ui[data-admin-theme="dark"] .border-slate-300 {
+  border-color: var(--ad-border);
+}
+.admin-ui[data-admin-theme="dark"] .border-slate-100,
+.admin-ui[data-admin-theme="dark"] .border-slate-50,
+.admin-ui[data-admin-theme="dark"] .divide-slate-100 > * + *,
+.admin-ui[data-admin-theme="dark"] .divide-slate-200 > * + * {
+  border-color: var(--ad-border-soft);
+}
+.admin-ui[data-admin-theme="dark"] .border-blue-100 {
+  border-color: color-mix(in srgb, #3b82f6 40%, var(--ad-border));
+}
+.admin-ui[data-admin-theme="dark"] .border-red-200 {
+  border-color: color-mix(in srgb, #ef4444 45%, var(--ad-border));
+}
+.admin-ui[data-admin-theme="dark"] .border-amber-200 {
+  border-color: color-mix(in srgb, #f59e0b 45%, var(--ad-border));
+}
+.admin-ui[data-admin-theme="dark"] .hover\:border-cyan-300:hover,
+.admin-ui[data-admin-theme="dark"] .hover\:border-blue-300:hover {
+  border-color: var(--ad-accent);
+}
+
+/* ---- text ------------------------------------------------------------ */
+.admin-ui[data-admin-theme="dark"] .text-slate-950,
+.admin-ui[data-admin-theme="dark"] .text-slate-900,
+.admin-ui[data-admin-theme="dark"] .text-\[\#120304\],
+.admin-ui[data-admin-theme="dark"] .text-\[\#3a3a3c\] {
+  color: var(--ad-text);
+}
+.admin-ui[data-admin-theme="dark"] .text-slate-800,
+.admin-ui[data-admin-theme="dark"] .text-slate-700,
+.admin-ui[data-admin-theme="dark"] .text-slate-600 {
+  color: color-mix(in srgb, var(--ad-text) 86%, transparent);
+}
+.admin-ui[data-admin-theme="dark"] .text-slate-500,
+.admin-ui[data-admin-theme="dark"] .text-\[\#777\] {
+  color: var(--ad-text-muted);
+}
+.admin-ui[data-admin-theme="dark"] .text-slate-400,
+.admin-ui[data-admin-theme="dark"] .text-slate-300 {
+  color: var(--ad-text-faint);
+}
+.admin-ui[data-admin-theme="dark"] .hover\:text-slate-950:hover,
+.admin-ui[data-admin-theme="dark"] .hover\:text-slate-700:hover {
+  color: var(--ad-text);
+}
+.admin-ui[data-admin-theme="dark"] .text-\[\#0087bd\],
+.admin-ui[data-admin-theme="dark"] .text-\[\#0091d0\],
+.admin-ui[data-admin-theme="dark"] .text-cyan-700,
+.admin-ui[data-admin-theme="dark"] .text-cyan-800,
+.admin-ui[data-admin-theme="dark"] .hover\:text-cyan-700:hover {
+  color: var(--ad-accent);
+}
+.admin-ui[data-admin-theme="dark"] .text-blue-700,
+.admin-ui[data-admin-theme="dark"] .text-blue-800,
+.admin-ui[data-admin-theme="dark"] .text-blue-900,
+.admin-ui[data-admin-theme="dark"] .hover\:text-blue-700:hover {
+  color: #7dd3fc;
+}
+.admin-ui[data-admin-theme="dark"] .text-emerald-700 {
+  color: #4ade80;
+}
+.admin-ui[data-admin-theme="dark"] .text-amber-700,
+.admin-ui[data-admin-theme="dark"] .text-orange-700 {
+  color: #fbbf24;
+}
+.admin-ui[data-admin-theme="dark"] .text-red-600,
+.admin-ui[data-admin-theme="dark"] .hover\:text-red-600:hover {
+  color: #f87171;
+}
+.admin-ui[data-admin-theme="dark"] .text-violet-500 {
+  color: #a78bfa;
+}
+
+/* ---- form controls ---------------------------------------------------- */
+.admin-ui[data-admin-theme="dark"] input::placeholder,
+.admin-ui[data-admin-theme="dark"] textarea::placeholder {
+  color: var(--ad-text-faint);
+}
+.admin-ui[data-admin-theme="dark"] .focus\:bg-white:focus {
+  background-color: var(--ad-surface-3);
+}
+.admin-ui[data-admin-theme="dark"] label > span,
+.admin-ui[data-admin-theme="dark"] fieldset > legend {
+  color: var(--ad-text-muted);
+}
+.admin-ui[data-admin-theme="dark"] option {
+  background-color: var(--ad-surface-2);
+  color: var(--ad-text);
+}
+
+/* ---- gradient page headers -------------------------------------------- */
+.admin-ui[data-admin-theme="dark"] .from-white {
+  --tw-gradient-from: var(--ad-surface);
+}
+.admin-ui[data-admin-theme="dark"] .via-blue-50\/70 {
+  --tw-gradient-via: color-mix(in srgb, #2563eb 22%, var(--ad-surface));
+}
+.admin-ui[data-admin-theme="dark"] .to-violet-50\/60 {
+  --tw-gradient-to: color-mix(in srgb, #8b5cf6 22%, var(--ad-surface));
+}
+
+/* ---- shadows soften in the dark --------------------------------------- */
+.admin-ui[data-admin-theme="dark"] .shadow-sm,
+.admin-ui[data-admin-theme="dark"] .shadow,
+.admin-ui[data-admin-theme="dark"] .shadow-lg,
+.admin-ui[data-admin-theme="dark"] .shadow-xl,
+.admin-ui[data-admin-theme="dark"] .shadow-2xl {
+  box-shadow: var(--ad-shadow-lg);
+}
+
+/* ---- scrollbars -------------------------------------------------------- */
+
+/* Theme transitions, applied only once the toggle has mounted so the
+   initial paint is not animated. */
+.admin-ui[data-admin-theme-ready="true"] *,
+.admin-ui[data-admin-theme-ready="true"] {
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+/* ---- chart series tokens ----------------------------------------------
+   Categorical slots are assigned in fixed order and never cycled. Both
+   modes were validated with the data-viz palette validator against their
+   own surface (light: all checks pass with the contrast relief rule, which
+   the legends and direct labels satisfy; dark: all checks pass).
+   ----------------------------------------------------------------------- */
+.admin-ui {
+  --viz-surface: rgb(var(--adc-surface));
+  --viz-grid: rgb(15 23 42 / 8%);
+  --viz-axis: #94a3b8;
+  --viz-series-1: #2a78d6;
+  --viz-series-2: #eb6834;
+  --viz-series-3: #1baf7a;
+  --viz-series-4: #eda100;
+  --viz-series-5: #e87ba4;
+}
+
+.admin-ui[data-admin-theme="dark"] {
+  --viz-grid: rgb(232 238 252 / 10%);
+  --viz-axis: #64789e;
+  --viz-series-1: #3987e5;
+  --viz-series-2: #d95926;
+  --viz-series-3: #199e70;
+  --viz-series-4: #c98500;
+  --viz-series-5: #d55181;
+}
+
+/* ---- admin token channels ---------------------------------------------
+   RGB triplets so Tailwind's `bg-ad-surface/60` style alpha works. The dark
+   theme redefines the same channels, which is what makes one utility class
+   correct in both themes.
+   ----------------------------------------------------------------------- */
+.admin-ui {
+  --adc-canvas: 234 238 246;
+  --adc-surface: 255 255 255;
+  --adc-raised: 255 255 255;
+  --adc-sunken: 243 246 251;
+  --adc-line: 210 219 232;
+  --adc-hairline: 228 234 243;
+  --adc-ink: 15 23 42;
+  --adc-muted: 71 85 105;
+  --adc-faint: 84 99 122;
+  --adc-accent: 0 109 155;
+  --adc-accent-soft: 230 246 252;
+  --adc-shadow: 15 23 42;
+  --adc-rail: 255 255 255;
+  --adc-rail-line: 224 231 241;
+  --adc-rail-ink: 15 23 42;
+  --adc-rail-muted: 71 85 105;
+  --adc-rail-faint: 84 99 122;
+  --adc-rail-hover: 240 244 250;
+  --adc-rail-active: 230 246 252;
+}
+
+.admin-ui[data-admin-theme="dark"] {
+  --adc-canvas: 6 11 24;
+  --adc-surface: 13 21 43;
+  --adc-raised: 17 28 56;
+  --adc-sunken: 10 17 36;
+  --adc-line: 34 48 79;
+  --adc-hairline: 26 39 66;
+  --adc-ink: 232 238 252;
+  --adc-muted: 148 166 200;
+  --adc-faint: 128 148 184;
+  --adc-accent: 56 189 248;
+  --adc-accent-soft: 14 43 69;
+  --adc-shadow: 0 0 0;
+  --adc-rail: 10 20 48;
+  --adc-rail-line: 27 41 71;
+  --adc-rail-ink: 230 237 251;
+  --adc-rail-muted: 148 166 200;
+  --adc-rail-faint: 128 148 184;
+  --adc-rail-hover: 22 35 64;
+  --adc-rail-active: 18 44 74;
+}
+
+/* Numerals in tables and metrics line up column to column. */
+.admin-ui .tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* A hairline highlight along the top edge of raised cards reads as depth
+   without a drop shadow doing the work. */
+.admin-ui .ad-card {
+  position: relative;
+}
+.admin-ui .ad-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 55%),
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.admin-ui[data-admin-theme="dark"] .ad-card::before {
+  opacity: 0.45;
+}
+
+/* Focus states are one ring everywhere, never a browser default outline. */
+.admin-ui :is(a, button, input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgb(var(--adc-surface)),
+    0 0 0 4px rgb(var(--adc-accent) / 0.55);
+  border-radius: 10px;
+}
+
+/* =========================================================================
+   Administration panel motion
+   Short, purposeful transitions only: a panel that arrives, a row that
+   settles, a save that confirms itself. Everything is switched off for
+   viewers who ask for reduced motion.
+   ========================================================================= */
+@keyframes ad-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ad-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ad-pop {
+  0% {
+    transform: scale(0.96);
+  }
+  60% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ad-flash {
+  from {
+    background-color: rgb(16 185 129 / 18%);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes ad-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes dashboard-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dashboard-aurora {
+  0%,
+  100% {
+    transform: translate3d(-15%, -8%, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(12%, 10%, 0) rotate(12deg);
+  }
+}
+
+@keyframes dashboard-draw {
+  from {
+    stroke-dashoffset: 1600;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dashboard-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 0 rgb(52 211 153 / 0));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgb(52 211 153 / 0.8));
+  }
+}
+
+@keyframes dashboard-metric-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--metric-width);
+  }
+}
+
+@keyframes dashboard-clock-focus {
+  from {
+    opacity: 0;
+    letter-spacing: 0.08em;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: -0.025em;
+    transform: none;
+  }
+}
+
+.admin-ui .dashboard-home > * {
+  animation: dashboard-enter 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.admin-ui .dashboard-home > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+.admin-ui .dashboard-home > *:nth-child(3) {
+  animation-delay: 130ms;
+}
+.admin-ui .dashboard-home > *:nth-child(4) {
+  animation-delay: 190ms;
+}
+.admin-ui .dashboard-home > *:nth-child(5) {
+  animation-delay: 240ms;
+}
+.admin-ui .dashboard-hero::after {
+  content: "";
+  position: absolute;
+  width: 42%;
+  aspect-ratio: 1;
+  left: 32%;
+  top: -120%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgb(103 232 249 / 0.22), transparent 67%);
+  animation: dashboard-aurora 9s ease-in-out infinite;
+  pointer-events: none;
+}
+.admin-ui .dashboard-clock-open {
+  position: relative;
+  isolation: isolate;
+}
+.admin-ui .dashboard-clock-open::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 32% -8% auto;
+  height: 54%;
+  background: radial-gradient(ellipse, rgb(34 211 238 / 14%), transparent 70%);
+  filter: blur(16px);
+  pointer-events: none;
+}
+.admin-ui .dashboard-clock-open time strong {
+  text-shadow: 0 8px 28px rgb(7 19 47 / 35%);
+  animation: dashboard-clock-focus 0.65s 0.12s cubic-bezier(0.16, 1, 0.3, 1)
+    both;
+}
+.admin-ui .dashboard-metric::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgb(255 255 255 / 0.2),
+    transparent 72%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.65s ease;
+  pointer-events: none;
+}
+.admin-ui .dashboard-metric-progress {
+  width: var(--metric-width);
+  animation: dashboard-metric-fill 0.85s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.admin-ui .dashboard-metric:hover::after {
+  transform: translateX(130%);
+}
+.admin-ui .dashboard-analytics {
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+.admin-ui .dashboard-analytics:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 30px 90px -38px rgb(20 73 170 / 0.72);
+}
+.admin-ui .dashboard-chart-line {
+  stroke-dasharray: 1600;
+  animation: dashboard-draw 1.35s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.admin-ui .dashboard-live-dot {
+  animation: dashboard-pulse 1.8s ease-in-out infinite;
+}
+
+.admin-ui .animate-rise {
+  animation: ad-rise 0.22s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+.admin-ui .animate-slide-in {
+  animation: ad-slide-in 0.24s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+.admin-ui .animate-pop {
+  animation: ad-pop 0.18s ease-out both;
+}
+.admin-ui .animate-flash {
+  animation: ad-flash 1.1s ease-out both;
+}
+
+/* Staggers a short list so it settles instead of snapping in. */
+.admin-ui .stagger > * {
+  animation: ad-rise 0.22s cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+.admin-ui .stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.admin-ui .stagger > *:nth-child(2) {
+  animation-delay: 25ms;
+}
+.admin-ui .stagger > *:nth-child(3) {
+  animation-delay: 50ms;
+}
+.admin-ui .stagger > *:nth-child(4) {
+  animation-delay: 75ms;
+}
+.admin-ui .stagger > *:nth-child(5) {
+  animation-delay: 100ms;
+}
+.admin-ui .stagger > *:nth-child(n + 6) {
+  animation-delay: 120ms;
+}
+
+/* A busy button shows a moving sheen rather than only dimming. */
+.admin-ui .is-busy {
+  position: relative;
+  overflow: hidden;
+}
+.admin-ui .is-busy::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 28%),
+    transparent
+  );
+  animation: ad-sheen 1s linear infinite;
+}
+
+/* Collapsible panels open and close instead of jumping. */
+.admin-ui .collapse-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.admin-ui .collapse-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.admin-ui .collapse-panel > * {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-ui *,
+  .admin-ui *::before,
+  .admin-ui *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .admin-ui .collapse-panel {
+    transition: none;
+  }
+}
+
+/* =========================================================================
+   Administration panel form fields
+   A white field on a white card has no edge, so every input gets a filled
+   ground and a visible hairline. One rule for the whole panel, rather than
+   per-component classes that drift apart.
+   ========================================================================= */
+.admin-ui
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+    select,
+    textarea
+  ) {
+  background-color: rgb(var(--adc-sunken));
+  border: 1px solid rgb(var(--adc-line));
+  border-radius: 10px;
+  color: rgb(var(--adc-ink));
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.admin-ui
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+    select,
+    textarea
+  ):hover {
+  border-color: rgb(var(--adc-accent) / 45%);
+}
+
+.admin-ui
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+    select,
+    textarea
+  ):focus {
+  background-color: rgb(var(--adc-surface));
+  border-color: rgb(var(--adc-accent));
+  box-shadow: 0 0 0 3px rgb(var(--adc-accent) / 18%);
+  outline: none;
+}
+
+/* The ring utilities on fields fought the border above; the border wins. */
+.admin-ui
+  :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea):is(
+    [class*="ring-"]
+  ) {
+  --tw-ring-shadow: 0 0 #0000;
+}
+
+/* Section and card hairlines need to be visible on a white card. */
+.admin-ui .ad-card {
+  border-radius: 16px;
+}
+
+/* A field that is read-only or disabled should look it. */
+.admin-ui :is(input, select, textarea):disabled {
+  background-color: rgb(var(--adc-hairline));
+  color: rgb(var(--adc-faint));
+  cursor: not-allowed;
+}
+
+/* Scrollbars inside the panel stay thin and quiet in both themes, so nested
+   scrolling areas do not stack up three loud grey bars. */
+.admin-ui *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.admin-ui *::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.admin-ui *::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--adc-faint) / 35%);
+  border-radius: 9999px;
+}
+.admin-ui *::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--adc-faint) / 60%);
+}
+.admin-ui * {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--adc-faint) / 35%) transparent;
+}
+
+/* The navigation rail is dark in both themes, so it needs its own thumb. */
+.admin-ui .bg-rail *::-webkit-scrollbar-thumb,
+.admin-ui nav[aria-label="Admin navigation"]::-webkit-scrollbar-thumb {
+  background-color: rgb(255 255 255 / 16%);
+}
+.admin-ui nav[aria-label="Admin navigation"] {
+  scrollbar-color: rgb(255 255 255 / 16%) transparent;
+}
+
+/* =========================================================================
+   Touch targets
+   The panel is dense on a desktop, where a 32px icon button is comfortable
+   with a mouse. On a touch screen the same button is too small and too close
+   to its neighbours, so icon-only controls grow to the 44px minimum only
+   where the pointer is coarse.
+   ========================================================================= */
+@media (pointer: coarse) {
+  .admin-ui :is(button, a, summary, [role="button"]).tap-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Rows of icon buttons also need room between them. */
+  .admin-ui .tap-row {
+    gap: 0.5rem;
+  }
+}

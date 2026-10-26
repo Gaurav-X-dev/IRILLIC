@@ -133,7 +133,7 @@ export function NavigationManager({
                 setMenus([...menus, freshMenu()]);
                 setSelected(menus.length);
               }}
-              className="grid h-9 w-9 place-items-center rounded-lg bg-[#0091d0] text-white"
+              className="tap-target grid h-9 w-9 place-items-center rounded-lg bg-[#0091d0] text-white"
             >
               <Plus size={16} />
             </button>

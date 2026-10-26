@@ -9,6 +9,7 @@ import { PasswordForm } from "@/components/admin/password-form";
 import { requireAdmin } from "@/lib/auth";
 import { cmsService } from "@/services/cms.service";
 import { getBranding } from "@/lib/branding";
+import "@/app/admin.css";
 
 export const dynamic = "force-dynamic";
 

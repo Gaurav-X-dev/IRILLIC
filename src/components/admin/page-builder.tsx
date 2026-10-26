@@ -430,7 +430,7 @@ export function PageBuilder({
                       type="button"
                       onClick={() => move(-1)}
                       disabled={busy || sections[0]?.id === selected.id}
-                      className="grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-30"
+                      className="tap-target grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-30"
                       aria-label="Move this section up the page"
                     >
                       <ChevronUp size={15} />
@@ -439,7 +439,7 @@ export function PageBuilder({
                       type="button"
                       onClick={() => move(1)}
                       disabled={busy || sections.at(-1)?.id === selected.id}
-                      className="grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-30"
+                      className="tap-target grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-30"
                       aria-label="Move this section down the page"
                     >
                       <ChevronDown size={15} />
@@ -461,7 +461,7 @@ export function PageBuilder({
                       type="button"
                       onClick={remove}
                       disabled={busy}
-                      className="grid h-8 w-8 place-items-center rounded-lg text-rose-500 ring-1 ring-ad-line transition-colors hover:bg-rose-500/10"
+                      className="tap-target grid h-8 w-8 place-items-center rounded-lg text-rose-500 ring-1 ring-ad-line transition-colors hover:bg-rose-500/10"
                       aria-label="Delete this section"
                     >
                       <Trash2 size={15} />

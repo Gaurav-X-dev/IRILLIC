@@ -431,7 +431,7 @@ function EnquiryDetail({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg p-2 text-ad-faint transition hover:bg-ad-sunken hover:text-ad-muted"
+            className="tap-target rounded-lg p-2 text-ad-faint transition hover:bg-ad-sunken hover:text-ad-muted"
           >
             <X size={18} />
           </button>

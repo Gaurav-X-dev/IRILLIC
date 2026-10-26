@@ -243,7 +243,7 @@ export function TablePagination({
           type="button"
           onClick={() => onPage(page - 1)}
           disabled={page <= 1}
-          className="grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-40"
+          className="tap-target grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-40"
           aria-label="Previous page"
         >
           <ChevronLeft size={15} />
@@ -255,7 +255,7 @@ export function TablePagination({
           type="button"
           onClick={() => onPage(page + 1)}
           disabled={page >= pageCount}
-          className="grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-40"
+          className="tap-target grid h-8 w-8 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-40"
           aria-label="Next page"
         >
           <ChevronRight size={15} />

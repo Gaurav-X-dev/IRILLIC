@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/admin/theme-toggle";
+import { AdminAvatar } from "@/components/admin/admin-avatar";
 import {
   CommandPalette,
   type CommandItem,
@@ -397,7 +398,7 @@ export function AdminShell({
             {sidebar}
             <button
               type="button"
-              className="absolute right-2.5 top-2.5 rounded-lg p-2 text-rail-muted transition-colors hover:text-rail-ink"
+              className="tap-target absolute right-2.5 top-2.5 rounded-lg p-2 text-rail-muted transition-colors hover:text-rail-ink"
               onClick={() => setMobileOpen(false)}
               aria-label="Close menu"
             >
@@ -414,7 +415,7 @@ export function AdminShell({
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
-              className="rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken lg:hidden"
+              className="tap-target rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken lg:hidden"
               onClick={() => {
                 setCollapsed(false);
                 setMobileOpen(true);
@@ -449,7 +450,7 @@ export function AdminShell({
               type="button"
               onClick={() => setPaletteOpen(true)}
               aria-label="Search the panel"
-              className="rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken xl:hidden"
+              className="tap-target rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken xl:hidden"
             >
               <Search size={17} />
             </button>
@@ -468,7 +469,7 @@ export function AdminShell({
             <div className="relative">
               <button
                 type="button"
-                className="relative rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken"
+                className="tap-target relative rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken"
                 onClick={() =>
                   setMenu((open) =>
                     open === "notifications" ? "none" : "notifications",
@@ -547,20 +548,7 @@ export function AdminShell({
                 aria-expanded={menu === "profile"}
                 aria-label="Account menu"
               >
-                <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-lg bg-ad-accent text-[11px] font-bold text-white">
-                  {admin.avatar ? (
-                    <Image
-                      src={admin.avatar}
-                      alt=""
-                      width={64}
-                      height={64}
-                      unoptimized
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    initials(admin.name)
-                  )}
-                </span>
+                <AdminAvatar name={admin.name} avatar={admin.avatar} />
                 <span className="hidden text-left lg:block">
                   <span className="block text-xs font-semibold leading-tight text-ad-ink">
                     {admin.name}

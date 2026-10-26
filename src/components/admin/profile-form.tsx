@@ -19,6 +19,8 @@ export function ProfileForm({
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState(profile.avatar);
+  // A stored avatar path can outlive its file on disk; fall back to the icon.
+  const [imageFailed, setImageFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -37,6 +39,7 @@ export function ProfileForm({
       if (!response.ok)
         throw new Error(payload.error || "Profile update failed");
       setPreview(payload.data.avatar);
+      setImageFailed(false);
       setSaved(true);
       router.refresh();
     } catch (cause) {
@@ -58,12 +61,16 @@ export function ProfileForm({
             className="group relative mx-auto block h-32 w-32 overflow-hidden rounded-[32px] bg-white/15 shadow-2xl ring-4 ring-white/25"
             aria-label="Choose a profile image"
           >
-            {preview ? (
+            {preview && !imageFailed ? (
               <Image
                 src={preview}
                 alt=""
                 fill
-                unoptimized
+                sizes="128px"
+                // A freshly chosen file is a blob: URL, which the optimiser
+                // cannot process.
+                unoptimized={preview.startsWith("blob:")}
+                onError={() => setImageFailed(true)}
                 className="object-cover"
               />
             ) : (

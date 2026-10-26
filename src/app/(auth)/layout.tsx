@@ -7,6 +7,7 @@ import {
   isAdminTheme,
   type AdminTheme,
 } from "@/lib/admin-theme";
+import "@/app/admin.css";
 
 /**
  * What the panel actually gives an administrator, in the order they will
