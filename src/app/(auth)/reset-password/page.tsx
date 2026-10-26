@@ -22,20 +22,26 @@ export default function ResetPasswordPage() {
     );
   }
   return (
-    <div>
-      <p className="mb-3 text-[11px] font-bold uppercase tracking-[.2em] text-[#0087bd]">
+    <div className="animate-rise">
+      <p className="text-[11px] font-bold uppercase tracking-[.2em] text-ad-accent">
         Account recovery
       </p>
-      <h1 className="text-3xl font-bold text-slate-950">
+      <h1 className="mt-2.5 text-[30px] font-bold leading-tight tracking-[-.025em] text-ad-ink">
         Choose a new password
       </h1>
-      <p className="mt-3 text-sm text-slate-500">
+      <p className="mt-2.5 text-sm leading-6 text-ad-muted">
         Use at least 12 characters and avoid passwords used elsewhere.
       </p>
       {done ? (
-        <div className="mt-8 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
+        <div
+          role="status"
+          className="mt-8 rounded-xl bg-emerald-500/10 p-4 text-sm text-emerald-600 ring-1 ring-emerald-500/25"
+        >
           {message}
-          <Link href="/login" className="mt-4 block font-semibold underline">
+          <Link
+            href="/login"
+            className="mt-4 block font-semibold text-ad-accent underline"
+          >
             Return to sign in
           </Link>
         </div>
@@ -48,13 +54,18 @@ export default function ResetPasswordPage() {
             required
             minLength={12}
             autoComplete="new-password"
-            className="h-12 w-full rounded-xl border border-slate-200 px-4 text-sm outline-none focus:border-cyan-500"
+            className="h-12 w-full px-4 text-sm"
             placeholder="New password"
           />
           {message ? (
-            <p className="mt-3 text-xs text-red-600">{message}</p>
+            <p
+              role="alert"
+              className="animate-pop mt-3 rounded-xl bg-rose-500/10 px-4 py-3 text-xs font-medium text-rose-500 ring-1 ring-rose-500/25"
+            >
+              {message}
+            </p>
           ) : null}
-          <button className="mt-5 h-12 w-full rounded-xl bg-[#0091d0] text-sm font-semibold text-white">
+          <button className="mt-5 h-12 w-full rounded-xl bg-ad-accent text-sm font-bold text-white transition-colors hover:brightness-110">
             Update password
           </button>
         </form>
