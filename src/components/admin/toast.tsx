@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={push}>
       {children}
       <div
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-[90] flex flex-col items-center gap-2 p-4 sm:inset-x-auto sm:right-0 sm:items-end"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-[200] flex flex-col items-center gap-2.5 p-4 sm:inset-x-auto sm:bottom-5 sm:right-5 sm:items-end sm:p-0"
         role="status"
         aria-live="polite"
       >
@@ -80,8 +80,10 @@ function ToastCard({
 
   return (
     <div
-      className={`animate-rise pointer-events-auto flex w-full max-w-[380px] items-start gap-3 rounded-xl bg-ad-raised p-3.5 shadow-ad-lg ring-1 ${
-        failed ? "ring-red-300" : "ring-ad-line"
+      className={`animate-rise pointer-events-auto flex w-full items-start gap-3 rounded-xl border-l-[3px] bg-ad-raised p-4 shadow-ad-lg ring-1 sm:w-[380px] ${
+        failed
+          ? "border-l-red-500 ring-red-200"
+          : "border-l-emerald-500 ring-ad-line"
       }`}
     >
       <Icon

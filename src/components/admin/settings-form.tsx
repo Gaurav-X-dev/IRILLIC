@@ -25,6 +25,14 @@ interface Field {
   label: string;
   placeholder?: string;
   type: FieldType;
+  /** Browser-side constraints; the server enforces the same rules again. */
+  pattern?: string;
+  title?: string;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  required?: boolean;
   hint?: string;
   /** Where on the live site this value appears. */
   usedOn?: string;
@@ -57,8 +65,17 @@ const SMTP_GROUPS: FieldGroup[] = [
         label: "SMTP host",
         placeholder: "smtp.example.com",
         type: "text",
+        minLength: 3,
+        maxLength: 255,
       },
-      { name: "port", label: "Port", placeholder: "587", type: "number" },
+      {
+        name: "port",
+        label: "Port",
+        placeholder: "587",
+        type: "number",
+        min: 1,
+        max: 65535,
+      },
       {
         name: "username",
         label: "Username",
@@ -85,6 +102,8 @@ const SMTP_GROUPS: FieldGroup[] = [
         label: "From name",
         placeholder: "IRILLIC",
         type: "text",
+        minLength: 2,
+        maxLength: 120,
       },
       {
         name: "fromEmail",
@@ -120,6 +139,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Website name",
         placeholder: "IRILLIC",
         type: "text",
+        minLength: 2,
+        maxLength: 120,
+        required: true,
         usedOn: "Browser tab, admin panel, sign-in screen, footer",
       },
       {
@@ -127,6 +149,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Legal entity name",
         placeholder: "Irillic Private Limited",
         type: "text",
+        minLength: 2,
+        maxLength: 160,
+        required: true,
         usedOn: "Footer copyright line",
       },
       {
@@ -134,6 +159,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Tagline",
         placeholder: "A Global Pioneer in Optical Surgical Imaging",
         type: "text",
+        minLength: 2,
+        maxLength: 200,
+        required: true,
         full: true,
       },
       {
@@ -141,6 +169,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Footer brand description",
         placeholder: "Pioneering real-time ICG fluorescence imaging…",
         type: "textarea",
+        minLength: 10,
+        maxLength: 600,
+        required: true,
         usedOn: "The paragraph beside the footer logo",
         full: true,
       },
@@ -201,6 +232,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         name: "seoTitle",
         label: "Default SEO title",
         type: "text",
+        minLength: 5,
+        maxLength: 200,
+        required: true,
         usedOn: "Search results and link previews",
         full: true,
       },
@@ -208,6 +242,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         name: "seoDescription",
         label: "Default meta description",
         type: "textarea",
+        minLength: 20,
+        maxLength: 320,
+        required: true,
         usedOn: "The grey text under your link in search results",
         full: true,
       },
@@ -216,6 +253,9 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Keywords",
         placeholder: "ICG fluorescence imaging, laparoscopic imaging",
         type: "text",
+        minLength: 3,
+        maxLength: 500,
+        required: true,
         hint: "Separate keywords with commas.",
         full: true,
       },
@@ -238,6 +278,10 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Contact phone",
         placeholder: "+91 …",
         type: "text",
+        pattern: "\+?[0-9\s()./-]{7,24}",
+        title:
+          "Digits with optional + ( ) - . and spaces, at least 7 digits.",
+        maxLength: 24,
         hint: "Include the country code, for example +91 76520 68867.",
         usedOn: "Homepage, contact page and global footer",
       },
@@ -565,6 +609,13 @@ function SettingField({
           type={field.type}
           defaultValue={initialValue}
           placeholder={field.placeholder}
+          pattern={field.pattern}
+          title={field.title}
+          minLength={field.minLength}
+          maxLength={field.maxLength}
+          min={field.min}
+          max={field.max}
+          required={field.required}
           className={INPUT_CLASS}
         />
       )}

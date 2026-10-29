@@ -66,8 +66,8 @@ export function PasswordForm() {
             Change administrator password
           </h2>
           <p className="mt-1 text-sm leading-6 text-ad-muted">
-            Current password mein wahi temporary password enter karein jisse
-            aapne login kiya tha.
+            Enter the temporary password you signed in with, then choose a new
+            one.
           </p>
         </div>
       </div>

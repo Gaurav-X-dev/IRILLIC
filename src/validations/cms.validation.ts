@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { phoneSchema } from "@/validations/setting.validation";
 
 export const contentInputSchema = z.object({
   type: z.enum(["page", "product", "application", "resource"]),
@@ -43,12 +44,34 @@ export const contentUpdateSchema = z.object({
 
 export const enquiryInputSchema = z.object({
   kind: z.string().trim().max(60).default("contact"),
-  name: z.string().trim().min(2).max(180),
-  email: z.string().trim().email().max(255),
-  phone: z.string().trim().max(40).optional(),
-  organisation: z.string().trim().max(255).optional(),
-  subject: z.string().trim().min(2).max(255),
-  message: z.string().trim().min(10).max(5000),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(180, "Name must be 180 characters or fewer"),
+  email: z
+    .string()
+    .trim()
+    .max(255)
+    .pipe(z.email("Enter a valid email address")),
+  // An enquiry is worth more than a tidy database, so the phone number is
+  // optional — but when one is given it has to be dialable.
+  phone: phoneSchema.optional(),
+  organisation: z
+    .string()
+    .trim()
+    .max(255, "Organisation must be 255 characters or fewer")
+    .optional(),
+  subject: z
+    .string()
+    .trim()
+    .min(2, "Choose a subject")
+    .max(255, "Subject must be 255 characters or fewer"),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Message must be at least 10 characters")
+    .max(5000, "Message must be 5000 characters or fewer"),
   website: z.string().max(255).optional(),
   metadata: z.record(z.string(), z.string().max(500)).optional().default({}),
 });

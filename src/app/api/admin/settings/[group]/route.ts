@@ -5,6 +5,7 @@ import { authorizeAdminApi } from "@/lib/admin-api";
 import { apiError, clientIp } from "@/lib/api";
 import { getSettingGroup, saveSettingGroup } from "@/services/settings.service";
 import { settingInputSchema } from "@/validations/cms.validation";
+import { validateSettingValues } from "@/validations/setting.validation";
 
 type Context = { params: Promise<{ group: string }> };
 export async function GET(_request: Request, context: Context) {
@@ -29,13 +30,14 @@ export async function PUT(request: Request, context: Context) {
       ...(await request.json()),
       group,
     });
-    await saveSettingGroup(group, input.values);
+    const values = validateSettingValues(group, input.values);
+    await saveSettingGroup(group, values);
     await db.insert(auditLogs).values({
       userId: auth.session.userId,
       action: "update",
       entityType: "settings",
       entityId: group,
-      changes: { keys: Object.keys(input.values) },
+      changes: { keys: Object.keys(values) },
       ipAddress: clientIp(request),
     });
     return NextResponse.json({
