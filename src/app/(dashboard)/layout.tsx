@@ -6,6 +6,7 @@ import {
   type AdminTheme,
 } from "@/lib/admin-theme";
 import { PasswordForm } from "@/components/admin/password-form";
+import { ConfirmProvider } from "@/components/admin/confirm";
 import { ToastProvider } from "@/components/admin/toast";
 import { requireAdmin } from "@/lib/auth";
 import { cmsService } from "@/services/cms.service";
@@ -71,7 +72,9 @@ export default async function DashboardLayout({
     >
       {/* Inside the shell, so the panel's theme variables reach the toasts;
           mounted outside them, the colours resolve to nothing. */}
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </ToastProvider>
     </AdminShell>
   );
 }

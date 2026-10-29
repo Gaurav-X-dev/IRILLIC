@@ -21,6 +21,7 @@ import {
   useTableControls,
 } from "@/components/admin/table-controls";
 import { useToast } from "@/components/admin/toast";
+import { useConfirm } from "@/components/admin/confirm";
 
 export interface ManagedUser {
   id: string;
@@ -44,6 +45,7 @@ export function UserRoleManager({
   const [editor, setEditor] = useState<ManagedUser | "new" | null>(null);
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
+  const confirm = useConfirm();
   const [message, setMessage] = useState("");
   const toast = useToast();
   useEffect(() => {
@@ -138,7 +140,13 @@ export function UserRoleManager({
   }
 
   async function remove(user: ManagedUser) {
-    if (!confirm(`Delete the Content Reader account for ${user.name}?`)) return;
+    const ok = await confirm({
+      title: `Delete the Content Reader account for ${user.name}?`,
+      message: "They lose access to the panel immediately.",
+      confirmLabel: "Delete account",
+      tone: "danger",
+    });
+    if (!ok) return;
     await request(
       `/api/v1/users/${user.id}`,
       { method: "DELETE" },

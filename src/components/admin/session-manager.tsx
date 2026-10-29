@@ -17,6 +17,8 @@ import {
   ServerPagination,
   type Pagination,
 } from "@/components/admin/audit-log-viewer";
+import { useConfirm } from "@/components/admin/confirm";
+import { useToast } from "@/components/admin/toast";
 
 interface Device {
   browser: string;
@@ -86,6 +88,11 @@ export function SessionManager() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
+  const confirm = useConfirm();
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+  }, [error, toast]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -123,12 +130,13 @@ export function SessionManager() {
   }, [search, status, limit]);
 
   async function revoke(row: SessionRow) {
-    if (
-      !window.confirm(
-        `Sign out ${row.userName ?? "this account"} on ${row.device.summary}? They will have to sign in again.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: `Sign out ${row.userName ?? "this account"}?`,
+      message: `The session on ${row.device.summary} ends immediately and they will have to sign in again.`,
+      confirmLabel: "End session",
+      tone: "danger",
+    });
+    if (!ok) return;
     setBusyId(row.id);
     setError("");
     try {
@@ -218,15 +226,6 @@ export function SessionManager() {
         </button>
 
       </div>
-
-      {error ? (
-        <p
-          role="alert"
-          className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs font-medium text-rose-500"
-        >
-          {error}
-        </p>
-      ) : null}
 
       <div className="ad-card overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
         <div className="overflow-x-auto">

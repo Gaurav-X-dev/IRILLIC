@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Building2,
@@ -19,6 +19,8 @@ import {
   TableSearch,
   useTableControls,
 } from "@/components/admin/table-controls";
+import { useConfirm } from "@/components/admin/confirm";
+import { useToast } from "@/components/admin/toast";
 
 export interface EnquiryRow {
   id: string;
@@ -50,6 +52,11 @@ export function EnquiryManager({ rows }: { rows: EnquiryRow[] }) {
   const [active, setActive] = useState<EnquiryRow | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const confirm = useConfirm();
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+  }, [error, toast]);
 
   const kinds = Array.from(new Set(rows.map((row) => row.kind))).sort();
   const table = useTableControls<EnquiryRow>({
@@ -106,27 +113,20 @@ export function EnquiryManager({ rows }: { rows: EnquiryRow[] }) {
   }
 
   async function remove(row: EnquiryRow) {
-    if (
-      !window.confirm(
-        `Delete the enquiry from ${row.name}? This cannot be undone.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: `Delete the enquiry from ${row.name}?`,
+      message:
+        "The message and the sender's contact details are removed for good.",
+      confirmLabel: "Delete enquiry",
+      tone: "danger",
+    });
+    if (!ok) return;
     const deleted = await request(row.id, { method: "DELETE" });
     if (deleted && active?.id === row.id) setActive(null);
   }
 
   return (
     <div className="space-y-4">
-      {error ? (
-        <p
-          role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-medium text-red-600"
-        >
-          {error}
-        </p>
-      ) : null}
-
       <div className="overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
         <div className="flex flex-wrap items-center gap-3 border-b border-ad-hairline px-5 py-4">
           <TableSearch

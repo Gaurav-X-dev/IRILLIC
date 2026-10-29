@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileText, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { VisualEditor } from "@/components/admin/page-builder";
@@ -10,6 +10,8 @@ import {
   TableSearch,
   useTableControls,
 } from "@/components/admin/table-controls";
+import { useConfirm } from "@/components/admin/confirm";
+import { useToast } from "@/components/admin/toast";
 
 type Row = {
   id: string;
@@ -58,6 +60,11 @@ export function ContentManager({
   const [selected, setSelected] = useState<Row | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const confirm = useConfirm();
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+  }, [error, toast]);
   const [contentDraft, setContentDraft] = useState<unknown>(NEW_CONTENT[type]);
   const table = useTableControls<Row>({
     rows: initialRows,
@@ -127,12 +134,19 @@ export function ContentManager({
   }
   async function remove(id: string) {
     if (readOnly) return;
-    if (!confirm("Delete this content permanently?")) return;
+    const ok = await confirm({
+      title: "Delete this content permanently?",
+      message: "It is removed from the public website as soon as you confirm.",
+      confirmLabel: "Delete",
+      tone: "danger",
+    });
+    if (!ok) return;
     const response = await fetch(`/api/admin/content/${id}`, {
       method: "DELETE",
     });
     const result = await response.json();
-    if (!response.ok) return alert(result.error || "Unable to delete content.");
+    if (!response.ok)
+      return toast("error", result.error || "Unable to delete content.");
     router.refresh();
   }
   return (
@@ -355,11 +369,6 @@ export function ContentManager({
                   Featured content
                 </label>
               </div>
-              {error ? (
-                <p role="alert" className="text-xs text-red-600">
-                  {error}
-                </p>
-              ) : null}
             </div>
             <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
