@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Loader2, RefreshCw, Search, ShieldAlert } from "lucide-react";
 import { EmptyState, buttonClass } from "@/components/admin/ui";
-import { ExportButtons } from "@/components/admin/export-buttons";
 import {
   ServerPagination,
   type Pagination,
@@ -155,7 +154,6 @@ export function SecurityEventViewer() {
           Refresh
         </button>
 
-        <ExportButtons dataset="security-events" />
       </div>
 
       {error ? (

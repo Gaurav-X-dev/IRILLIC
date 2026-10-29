@@ -4,7 +4,6 @@ import { useState } from "react";
 import { FileText, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { VisualEditor } from "@/components/admin/page-builder";
-import { ExportButtons } from "@/components/admin/export-buttons";
 import {
   TableFilter,
   TablePagination,
@@ -179,7 +178,6 @@ export function ContentManager({
             />
           </div>
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-            <ExportButtons dataset="content" type={type} />
             {readOnly ? (
               <span className="inline-flex h-11 items-center justify-center rounded-xl bg-ad-accent-soft px-4 text-xs font-bold text-ad-accent">
                 Content Reader · View only

@@ -21,7 +21,6 @@ import {
   TablePagination,
   useTableControls,
 } from "@/components/admin/table-controls";
-import { ExportButtons } from "@/components/admin/export-buttons";
 
 export interface ManagedUser {
   id: string;
@@ -237,7 +236,6 @@ export function UserRoleManager({
                 { value: "disabled", label: "Disabled" },
               ]}
             />
-            <ExportButtons dataset="users" />
           </div>
         </header>
 

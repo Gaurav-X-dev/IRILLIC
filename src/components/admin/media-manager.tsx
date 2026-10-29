@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { Check, Copy, FileImage, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ExportButtons } from "@/components/admin/export-buttons";
 import {
   TableFilter,
   TablePagination,
@@ -119,7 +118,6 @@ export function MediaManager({
             />
           </div>
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-            <ExportButtons dataset="media" />
             {readOnly ? (
               <span className="inline-flex h-10 items-center rounded-lg bg-ad-accent-soft px-4 text-xs font-bold text-ad-accent">
                 Content Reader · View only

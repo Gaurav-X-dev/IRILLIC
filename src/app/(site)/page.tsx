@@ -263,7 +263,7 @@ export default async function HomePage() {
           </header>
 
           <div className="cases">
-            {content.caseStudies.map((item) => (
+            {content.caseStudies.slice(-3).map((item) => (
               <article
                 className={item.wide ? "case case--wide reveal" : "case reveal"}
                 key={item.title}

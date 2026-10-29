@@ -199,31 +199,6 @@ export function PageBuilder({
       setBusy(false);
     }
   }
-  async function addSection() {
-    if (readOnly) return;
-    const sectionKey = prompt(
-      "Section key (lowercase, for example testimonials)",
-    );
-    if (!sectionKey) return;
-    const sectionLabel =
-      prompt("Section name", sectionKey.replace(/-/g, " ")) || sectionKey;
-    setBusy(true);
-    try {
-      await request(`/api/admin/pages/${pageId}/sections`, "POST", {
-        sectionKey,
-        label: sectionLabel,
-        data: { heading: sectionLabel, body: "" },
-        isEnabled: true,
-      });
-      router.refresh();
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Unable to add section",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
 
   if (!pages.length)
     return (
@@ -282,22 +257,13 @@ export function PageBuilder({
                   {sections.length === 1 ? "" : "s"}
                 </p>
               </div>
+              {/* The website has a fixed set of pages and sections; the panel
+                  edits what is there rather than inventing new blocks. */}
               {readOnly ? (
                 <span className="rounded-full bg-ad-accent-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-ad-accent">
                   Read only
                 </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={addSection}
-                  disabled={busy}
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ad-accent text-white transition-transform hover:scale-105 disabled:opacity-50"
-                  aria-label="Add a section"
-                  title="Add a section"
-                >
-                  <Plus size={15} />
-                </button>
-              )}
+              ) : null}
             </div>
 
             <div className="border-b border-ad-hairline p-3 xl:hidden">

@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { EmptyState, StatTile, buttonClass } from "@/components/admin/ui";
-import { ExportButtons } from "@/components/admin/export-buttons";
 import {
   ServerPagination,
   type Pagination,
@@ -218,7 +217,6 @@ export function SessionManager() {
           Refresh
         </button>
 
-        <ExportButtons dataset="sessions" />
       </div>
 
       {error ? (

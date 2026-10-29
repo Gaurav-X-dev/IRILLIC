@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { FileClock, Filter, Loader2, RefreshCw, Search, X } from "lucide-react";
 import { EmptyState, StatusPill, buttonClass } from "@/components/admin/ui";
-import { ExportButtons } from "@/components/admin/export-buttons";
 
 interface AuditRow {
   id: string;
@@ -164,7 +163,6 @@ export function AuditLogViewer() {
           Refresh
         </button>
 
-        <ExportButtons dataset="audit" />
       </div>
 
       {error ? (

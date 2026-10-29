@@ -12,26 +12,6 @@ import {
 } from "lucide-react";
 import type { MegaSection, NavLink } from "@/types/site.types";
 
-const freshMenu = (): MegaSection => ({
-  key: `new-tab-${Date.now()}`,
-  label: "New tab",
-  heading: "New navigation section",
-  intro: "Describe this section.",
-  cta: { label: "Explore", href: "/" },
-  columns: [
-    { title: "Explore", links: [{ label: "Overview", href: "/" }] },
-    { title: "Resources", links: [{ label: "Learn more", href: "/" }] },
-  ],
-  feature: {
-    image: "/images/theme/panel-people.svg",
-    href: "/",
-    label: "Featured",
-    title: "Featured content",
-    cta: "Explore",
-  },
-  downloadsLabel: "Quick downloads",
-  match: ["/"],
-});
 
 export function NavigationManager({
   sectionId,
@@ -128,15 +108,6 @@ export function NavigationManager({
               </p>
               <p className="text-[10px] text-ad-faint">{menus.length} tabs</p>
             </div>
-            <button
-              onClick={() => {
-                setMenus([...menus, freshMenu()]);
-                setSelected(menus.length);
-              }}
-              className="tap-target grid h-9 w-9 place-items-center rounded-lg bg-[#0091d0] text-white"
-            >
-              <Plus size={16} />
-            </button>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible lg:pb-0">
             {menus.map((item, i) => (
