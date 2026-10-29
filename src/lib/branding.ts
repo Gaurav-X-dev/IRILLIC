@@ -23,19 +23,32 @@ export function applyGlobalContact<
   };
 }
 
+/**
+ * Settings arrive from JSONB, where a value that reads as a number — a phone
+ * number typed without its country code, say — comes back as one. That is
+ * still the setting the administrator entered, so it is read as text rather
+ * than rejected.
+ */
+function asText(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return null;
+}
+
 function requiredText(settings: Record<string, unknown>, key: string): string {
-  const value = settings[key];
-  if (typeof value !== "string" || !value.trim())
+  const value = asText(settings[key]);
+  if (!value || !value.trim())
     throw new Error(`Required general setting "${key}" is missing.`);
   return value.trim();
 }
 
 function optionalText(settings: Record<string, unknown>, key: string): string {
-  const value = settings[key];
-  if (value == null || value === "") return "";
-  if (typeof value !== "string")
+  const raw = settings[key];
+  if (raw == null || raw === "") return "";
+  const value = asText(raw);
+  if (value === null)
     throw new Error(
-      `General setting "${key}" must be text, received ${typeof value}: ${JSON.stringify(value)?.slice(0, 120)}`,
+      `General setting "${key}" must be text, received ${typeof raw}: ${JSON.stringify(raw)?.slice(0, 120)}`,
     );
   return value.trim();
 }

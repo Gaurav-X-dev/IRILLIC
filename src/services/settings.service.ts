@@ -31,8 +31,17 @@ export async function saveSettingGroup(
     const settingKey = `${group}.${name}`;
     const isSecret = SECRET_KEYS.has(settingKey);
     if (isSecret && (raw === "" || raw === "••••••••")) continue;
-    const value =
-      isSecret && typeof raw === "string" ? encryptSecret(raw) : raw;
+    // Every setting but the SMTP port is text. A value that happens to read as
+    // a number — a phone number, a postcode — must not be stored as one, or it
+    // comes back from JSONB as a number and no longer matches its own type.
+    const text = typeof raw === "number" && settingKey !== "smtp.port";
+    const value = isSecret
+      ? typeof raw === "string"
+        ? encryptSecret(raw)
+        : raw
+      : text
+        ? String(raw)
+        : raw;
     await db
       .insert(siteSettings)
       .values({ key: settingKey, group, value, isSecret })
