@@ -12,14 +12,18 @@ export const phoneSchema = z
   .string()
   .trim()
   .max(24, "Phone number must be 24 characters or fewer")
+  // Characters first, then how many digits they add up to, so each failure
+  // reports the thing the editor actually got wrong.
   .refine(
-    (value) => value === "" || /^\+?[\d\s()./-]{7,24}$/.test(value),
+    (value) => value === "" || /^\+?[\d\s()./-]*$/.test(value),
     "Phone number may contain digits, spaces and + ( ) - . only",
   )
-  .refine(
-    (value) => value === "" || (value.match(/\d/g)?.length ?? 0) >= 7,
-    "Phone number needs at least 7 digits",
-  );
+  .refine((value) => {
+    if (value === "") return true;
+    const digits = value.match(/\d/g)?.length ?? 0;
+    // E.164 allows at most 15 digits worldwide; fewer than 7 is not dialable.
+    return digits >= 7 && digits <= 15;
+  }, "Phone number must have between 7 and 15 digits");
 
 export const emailSchema = z
   .string()

@@ -278,9 +278,11 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Contact phone",
         placeholder: "+91 …",
         type: "text",
-        pattern: "\+?[0-9\s()./-]{7,24}",
+        // The lookahead counts digits; the rest limits which characters
+        // may sit between them.
+        pattern: "(?=(?:[^0-9]*[0-9]){7,15}[^0-9]*$)\+?[0-9\s()./-]{7,24}",
         title:
-          "Digits with optional + ( ) - . and spaces, at least 7 digits.",
+          "Between 7 and 15 digits, with optional + ( ) - . and spaces.",
         maxLength: 24,
         hint: "Include the country code, for example +91 76520 68867.",
         usedOn: "Homepage, contact page and global footer",
