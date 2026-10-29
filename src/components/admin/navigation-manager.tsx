@@ -148,17 +148,6 @@ export function NavigationManager({
                   >
                     <ArrowDown size={15} />
                   </Btn>
-                  <Btn
-                    danger
-                    onClick={() => {
-                      if (confirm(`Remove ${menu.label}?`)) {
-                        setMenus(menus.filter((_, i) => i !== selected));
-                        setSelected(Math.max(0, selected - 1));
-                      }
-                    }}
-                  >
-                    <Trash2 size={15} />
-                  </Btn>
                 </div>
               </div>
               <Box
@@ -410,18 +399,16 @@ function Btn({
   children,
   onClick,
   disabled,
-  danger,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
-  danger?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`grid h-9 w-9 place-items-center rounded-lg ring-1 transition-colors disabled:opacity-30 ${danger ? "text-rose-500 ring-rose-500/30 hover:bg-rose-500/10" : "text-ad-muted ring-ad-line hover:bg-ad-sunken"}`}
+      className="grid h-9 w-9 place-items-center rounded-lg text-ad-muted ring-1 ring-ad-line transition-colors hover:bg-ad-sunken disabled:opacity-30"
     >
       {children}
     </button>

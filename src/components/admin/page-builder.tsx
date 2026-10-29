@@ -10,7 +10,6 @@ import {
   Plus,
   Save,
   Search,
-  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -155,27 +154,6 @@ export function PageBuilder({
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Unable to change visibility",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-  async function remove() {
-    if (
-      !selected ||
-      readOnly ||
-      !confirm(`Delete the “${selected.label}” section?`)
-    )
-      return;
-    setBusy(true);
-    setError("");
-    try {
-      await request(`/api/admin/sections/${selected.id}`, "DELETE");
-      setSectionId("");
-      router.refresh();
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Unable to delete section",
       );
     } finally {
       setBusy(false);
@@ -428,15 +406,6 @@ export function PageBuilder({
                         <EyeOff size={14} />
                       )}
                       {selected.isEnabled ? "Visible" : "Hidden"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={remove}
-                      disabled={busy}
-                      className="tap-target grid h-8 w-8 place-items-center rounded-lg text-rose-500 ring-1 ring-ad-line transition-colors hover:bg-rose-500/10"
-                      aria-label="Delete this section"
-                    >
-                      <Trash2 size={15} />
                     </button>
                   </div>
                 )}
