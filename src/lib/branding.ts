@@ -34,7 +34,9 @@ function optionalText(settings: Record<string, unknown>, key: string): string {
   const value = settings[key];
   if (value == null || value === "") return "";
   if (typeof value !== "string")
-    throw new Error(`General setting "${key}" must be text.`);
+    throw new Error(
+      `General setting "${key}" must be text, received ${typeof value}: ${JSON.stringify(value)?.slice(0, 120)}`,
+    );
   return value.trim();
 }
 
