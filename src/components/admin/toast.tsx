@@ -80,10 +80,8 @@ function ToastCard({
 
   return (
     <div
-      className={`animate-rise pointer-events-auto flex w-full items-start gap-3 rounded-xl border-l-[3px] bg-ad-raised p-4 shadow-ad-lg ring-1 sm:w-[380px] ${
-        failed
-          ? "border-l-red-500 ring-red-200"
-          : "border-l-emerald-500 ring-ad-line"
+      className={`animate-rise pointer-events-auto flex w-full items-start gap-3 rounded-xl border-l-4 bg-ad-raised p-4 shadow-ad-lg ring-1 ring-ad-line sm:w-[380px] ${
+        failed ? "border-l-red-500" : "border-l-emerald-500"
       }`}
     >
       <Icon
@@ -91,7 +89,7 @@ function ToastCard({
         aria-hidden="true"
         className={`mt-px shrink-0 ${failed ? "text-red-600" : "text-emerald-600"}`}
       />
-      <p className="min-w-0 flex-1 text-[13px] leading-5 text-ad-ink">
+      <p className="min-w-0 flex-1 text-[13px] font-medium leading-5 text-ad-ink">
         {toast.message}
       </p>
       <button

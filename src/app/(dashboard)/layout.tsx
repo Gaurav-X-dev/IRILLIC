@@ -57,21 +57,21 @@ export default async function DashboardLayout({
         : "light"
       : themePreference;
   return (
-    <ToastProvider>
-      <AdminShell
-        admin={{
-          name: admin.name,
-          email: admin.email,
-          role: admin.role,
-          avatar: admin.avatar,
-        }}
-        topbar={topbar}
-        branding={branding}
-        themePreference={themePreference}
-        resolvedTheme={resolvedTheme}
-      >
-        {children}
-      </AdminShell>
-    </ToastProvider>
+    <AdminShell
+      admin={{
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+        avatar: admin.avatar,
+      }}
+      topbar={topbar}
+      branding={branding}
+      themePreference={themePreference}
+      resolvedTheme={resolvedTheme}
+    >
+      {/* Inside the shell, so the panel's theme variables reach the toasts;
+          mounted outside them, the colours resolve to nothing. */}
+      <ToastProvider>{children}</ToastProvider>
+    </AdminShell>
   );
 }
