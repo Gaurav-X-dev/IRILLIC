@@ -632,22 +632,44 @@ function AssetField({
         />
       </span>
       {images.length ? (
-        <datalist id={listId}>
-          {images.map((asset) => (
-            <option key={asset.id} value={asset.url}>
-              {asset.name}
-            </option>
-          ))}
-        </datalist>
-      ) : (
-        <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-ad-faint">
-          <Upload size={11} aria-hidden="true" />
-          <Link href="/dashboard/media" className="text-ad-accent underline">
-            Upload to the media library
-          </Link>{" "}
-          to pick files here.
-        </span>
-      )}
+        <>
+          <datalist id={listId}>
+            {images.map((asset) => (
+              <option key={asset.id} value={asset.url}>
+                {asset.name}
+              </option>
+            ))}
+          </datalist>
+          {/* Typing into the field filters the datalist, but an administrator
+              who does not know the file name needs the whole library in view. */}
+          <select
+            aria-label="Choose from the media library"
+            value={images.some((asset) => asset.url === value) ? value : ""}
+            onChange={(event) => setValue(event.target.value)}
+            className="mt-1.5 h-9 w-full rounded-lg bg-ad-surface px-2 text-xs ring-1 ring-ad-line"
+          >
+            <option value="">Choose from the media library…</option>
+            {images.map((asset) => (
+              <option key={asset.id} value={asset.url}>
+                {asset.name}
+              </option>
+            ))}
+          </select>
+        </>
+      ) : null}
+      {/* Opened in a new tab so an unsaved form is never navigated away from. */}
+      <span className="mt-1.5 flex items-center gap-1.5 text-[11px] text-ad-faint">
+        <Upload size={11} aria-hidden="true" />
+        <Link
+          href="/dashboard/media"
+          target="_blank"
+          rel="noopener"
+          className="text-ad-accent underline"
+        >
+          {images.length ? "Manage the media library" : "Upload to the media library"}
+        </Link>
+        <span className="sr-only">(opens in a new tab)</span>
+      </span>
     </>
   );
 }

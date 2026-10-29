@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -867,6 +867,33 @@ function FieldLabel({
   );
 }
 
+type MediaImage = { id: string; name: string; url: string; mimeType: string };
+
+/**
+ * The media library, fetched once per page load and shared by every image
+ * field, so a form with a dozen images does not make a dozen requests.
+ */
+let mediaRequest: Promise<MediaImage[]> | null = null;
+
+function useMediaImages() {
+  const [images, setImages] = useState<MediaImage[]>([]);
+  useEffect(() => {
+    mediaRequest ??= fetch("/api/admin/media?limit=200")
+      .then((response) => (response.ok ? response.json() : { data: [] }))
+      .then((body) => (body.data as MediaImage[]) ?? [])
+      .catch(() => []);
+    let active = true;
+    mediaRequest.then((assets) => {
+      if (active)
+        setImages(assets.filter((a) => a.mimeType?.startsWith("image/")));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+  return images;
+}
+
 /** An image path with a live thumbnail, so an editor sees what they picked. */
 function ImageField({
   label,
@@ -878,6 +905,7 @@ function ImageField({
   onChange: (next: string) => void;
 }) {
   const meta = fieldMeta(label);
+  const images = useMediaImages();
   return (
     <label className="block">
       <span className="mb-1.5 block text-[11px] font-semibold text-ad-muted">
@@ -904,12 +932,33 @@ function ImageField({
             placeholder="/images/theme/hero-1-operating-room.svg"
             className="h-10 w-full rounded-lg bg-ad-surface px-3 text-sm outline-none ring-1 ring-ad-line focus:ring-ad-accent"
           />
+          {images.length ? (
+            <select
+              aria-label="Choose from the media library"
+              value={images.some((a) => a.url === value) ? value : ""}
+              onChange={(event) => onChange(event.target.value)}
+              className="mt-1.5 h-9 w-full rounded-lg bg-ad-surface px-2 text-xs outline-none ring-1 ring-ad-line focus:ring-ad-accent"
+            >
+              <option value="">Choose from the media library…</option>
+              {images.map((asset) => (
+                <option key={asset.id} value={asset.url}>
+                  {asset.name}
+                </option>
+              ))}
+            </select>
+          ) : null}
           <span className="mt-1.5 block text-[11px] text-ad-faint">
-            Paste a path, or copy one from the{" "}
-            <Link href="/dashboard/media" className="text-ad-accent underline">
+            Paste a path, or open the{" "}
+            {/* New tab: this form may hold unsaved edits. */}
+            <Link
+              href="/dashboard/media"
+              target="_blank"
+              rel="noopener"
+              className="text-ad-accent underline"
+            >
               media library
             </Link>
-            .
+            <span className="sr-only">(opens in a new tab)</span>.
           </span>
         </span>
       </span>

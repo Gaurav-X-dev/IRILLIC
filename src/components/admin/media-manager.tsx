@@ -34,6 +34,7 @@ export function MediaManager({
   readOnly?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [chosen, setChosen] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
@@ -78,7 +79,15 @@ export function MediaManager({
     const result = await response.json();
     setBusy(false);
     if (!response.ok) return setError(result.error || "Upload failed");
-    setOpen(false);
+    // Part of a batch can fail on its own; say which, and keep the rest.
+    const rejected: { name: string; error: string }[] = result.failed ?? [];
+    if (rejected.length)
+      setError(
+        `${rejected.length} file${rejected.length > 1 ? "s were" : " was"} not uploaded: ` +
+          rejected.map((f) => `${f.name} (${f.error})`).join(", "),
+      );
+    else setOpen(false);
+    setChosen(0);
     router.refresh();
   }
   return (
@@ -205,19 +214,34 @@ export function MediaManager({
                 name="file"
                 type="file"
                 required
+                multiple
+                onChange={(event) =>
+                  setChosen(event.currentTarget.files?.length ?? 0)
+                }
                 accept="image/jpeg,image/png,image/webp,application/pdf,video/mp4"
                 className="block w-full rounded-lg border border-dashed border-ad-line p-5 text-xs"
               />
-              <input
-                name="name"
-                placeholder="Display name"
-                className="h-11 w-full rounded-lg ring-1 ring-ad-line px-3 text-sm"
-              />
-              <input
-                name="altText"
-                placeholder="Accessible alt text"
-                className="h-11 w-full rounded-lg ring-1 ring-ad-line px-3 text-sm"
-              />
+              <p className="text-[11px] text-ad-faint">
+                {chosen > 1
+                  ? `${chosen} files selected — each keeps its own file name.`
+                  : "Choose one file, or several to upload them together."}
+              </p>
+              {/* A display name and alt text describe one file, so they are
+                  offered only when one file is being uploaded. */}
+              {chosen > 1 ? null : (
+                <>
+                  <input
+                    name="name"
+                    placeholder="Display name"
+                    className="h-11 w-full rounded-lg ring-1 ring-ad-line px-3 text-sm"
+                  />
+                  <input
+                    name="altText"
+                    placeholder="Accessible alt text"
+                    className="h-11 w-full rounded-lg ring-1 ring-ad-line px-3 text-sm"
+                  />
+                </>
+              )}
               <input
                 name="folder"
                 placeholder="Folder"
@@ -230,7 +254,11 @@ export function MediaManager({
               disabled={busy}
               className="mt-6 h-11 w-full rounded-lg bg-ad-accent text-sm font-semibold text-white"
             >
-              {busy ? "Uploading…" : "Upload file"}
+              {busy
+                ? "Uploading…"
+                : chosen > 1
+                  ? `Upload ${chosen} files`
+                  : "Upload file"}
             </button>
           </form>
         </div>

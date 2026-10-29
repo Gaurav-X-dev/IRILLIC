@@ -58,88 +58,108 @@ export async function GET(request: Request) {
     return apiError(error);
   }
 }
+/** One stored file, or the reason it could not be stored. */
+type Stored =
+  | { ok: true; asset: typeof mediaAssets.$inferSelect }
+  | { ok: false; name: string; error: string };
+
+async function storeFile(
+  file: File,
+  meta: { folder: string; name: string; altText: string },
+): Promise<Stored> {
+  const fail = (error: string): Stored => ({ ok: false, name: file.name, error });
+  let extension = allowed.get(file.type);
+  if (!extension) return fail("Unsupported file type");
+  if (file.size > 10 * 1024 * 1024) return fail("File must be 10 MB or smaller");
+  const source = Buffer.from(await file.arrayBuffer());
+  const isImage = file.type.startsWith("image/");
+  if (!isImage && !hasExpectedFileSignature(file.type, source))
+    return fail("File content does not match its declared type");
+  let output: Buffer;
+  try {
+    output = isImage
+      ? await sharp(source, { limitInputPixels: 40_000_000 })
+          .rotate()
+          .webp({
+            quality: 84,
+            alphaQuality: 90,
+            smartSubsample: true,
+            effort: 5,
+          })
+          .toBuffer()
+      : source;
+  } catch {
+    return fail("Image is corrupt or exceeds the 40 megapixel limit");
+  }
+  if (isImage) extension = "webp";
+  const filename = `${randomUUID()}.${extension}`;
+  const directory = path.join(process.cwd(), "public", "uploads", meta.folder);
+  await mkdir(directory, { recursive: true });
+  await writeFile(path.join(directory, filename), output, { flag: "wx" });
+  const [asset] = await db
+    .insert(mediaAssets)
+    .values({
+      name: (meta.name || file.name).slice(0, 255),
+      url: `/uploads/${meta.folder}/${filename}`,
+      mimeType: isImage ? "image/webp" : file.type,
+      size: output.length,
+      altText: meta.altText.slice(0, 500),
+      folder: meta.folder,
+    })
+    .returning();
+  return { ok: true, asset };
+}
+
 export async function POST(request: Request) {
   try {
     const auth = await authorizeAdminApi();
     if (auth.response || !auth.session) return auth.response;
     const form = await request.formData();
-    const file = form.get("file");
-    if (!(file instanceof File))
+    const files = form
+      .getAll("file")
+      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+    if (!files.length)
       return NextResponse.json(
-        { success: false, error: "Choose a file" },
+        { success: false, error: "Choose at least one file" },
         { status: 400 },
       );
-    let extension = allowed.get(file.type);
-    if (!extension)
-      return NextResponse.json(
-        { success: false, error: "Unsupported file type" },
-        { status: 415 },
-      );
-    if (file.size > 10 * 1024 * 1024)
-      return NextResponse.json(
-        { success: false, error: "File must be 10 MB or smaller" },
-        { status: 413 },
-      );
-    const source = Buffer.from(await file.arrayBuffer());
-    const isImage = file.type.startsWith("image/");
-    if (!isImage && !hasExpectedFileSignature(file.type, source))
-      return NextResponse.json(
-        {
-          success: false,
-          error: "File content does not match its declared type",
-        },
-        { status: 400 },
-      );
-    let output: Buffer;
-    try {
-      output = isImage
-        ? await sharp(source, { limitInputPixels: 40_000_000 })
-            .rotate()
-            .webp({
-              quality: 84,
-              alphaQuality: 90,
-              smartSubsample: true,
-              effort: 5,
-            })
-            .toBuffer()
-        : source;
-    } catch {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Image is corrupt or exceeds the 40 megapixel limit",
-        },
-        { status: 400 },
-      );
-    }
-    if (isImage) extension = "webp";
     const folder = String(form.get("folder") || "general")
       .replace(/[^a-z0-9-]/gi, "-")
       .toLowerCase();
-    const filename = `${randomUUID()}.${extension}`;
-    const directory = path.join(process.cwd(), "public", "uploads", folder);
-    await mkdir(directory, { recursive: true });
-    await writeFile(path.join(directory, filename), output, { flag: "wx" });
-    const [asset] = await db
-      .insert(mediaAssets)
-      .values({
-        name: String(form.get("name") || file.name).slice(0, 255),
-        url: `/uploads/${folder}/${filename}`,
-        mimeType: isImage ? "image/webp" : file.type,
-        size: output.length,
-        altText: String(form.get("altText") || "").slice(0, 500),
-        folder,
-      })
-      .returning();
-    await db.insert(auditLogs).values({
-      userId: auth.session.userId,
-      action: "upload",
-      entityType: "media",
-      entityId: asset.id,
-      changes: { name: asset.name, url: asset.url },
-      ipAddress: clientIp(request),
-    });
-    return NextResponse.json({ success: true, data: asset }, { status: 201 });
+    // A display name belongs to one file. Uploading several keeps each file's
+    // own name, since one name cannot describe all of them.
+    const single = files.length === 1;
+    const name = single ? String(form.get("name") || "") : "";
+    const altText = single ? String(form.get("altText") || "") : "";
+
+    const results: Stored[] = [];
+    for (const file of files)
+      results.push(await storeFile(file, { folder, name, altText }));
+
+    const stored = results.filter((r) => r.ok).map((r) => r.asset);
+    const failed = results
+      .filter((r): r is Extract<Stored, { ok: false }> => !r.ok)
+      .map(({ name: fileName, error }) => ({ name: fileName, error }));
+
+    for (const asset of stored)
+      await db.insert(auditLogs).values({
+        userId: auth.session.userId,
+        action: "upload",
+        entityType: "media",
+        entityId: asset.id,
+        changes: { name: asset.name, url: asset.url },
+        ipAddress: clientIp(request),
+      });
+
+    if (!stored.length)
+      return NextResponse.json(
+        { success: false, error: failed[0]?.error ?? "Upload failed", failed },
+        { status: 415 },
+      );
+    return NextResponse.json(
+      { success: true, data: single ? stored[0] : stored, stored: stored.length, failed },
+      { status: 201 },
+    );
   } catch (error) {
     return apiError(error, "File could not be uploaded");
   }
