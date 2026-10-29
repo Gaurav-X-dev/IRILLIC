@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Camera,
-  CheckCircle2,
   Save,
   ShieldCheck,
   UserRound,
 } from "lucide-react";
+import { useToast } from "@/components/admin/toast";
 
 export function ProfileForm({
   profile,
@@ -24,6 +24,11 @@ export function ProfileForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+    else if (saved) toast("success", "Profile saved successfully.");
+  }, [error, saved, toast]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -157,21 +162,7 @@ export function ProfileForm({
           </label>
         </div>
         <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-ad-hairline pt-5">
-          <div>
-            {error ? (
-              <p className="text-xs font-medium text-rose-500" role="alert">
-                {error}
-              </p>
-            ) : null}
-            {saved ? (
-              <p
-                className="flex items-center gap-1.5 text-xs font-medium text-emerald-600"
-                role="status"
-              >
-                <CheckCircle2 size={14} /> Profile saved successfully.
-              </p>
-            ) : null}
-          </div>
+          <div />
           <button
             disabled={busy}
             className={`inline-flex h-11 items-center gap-2 rounded-xl bg-ad-accent px-5 text-xs font-bold text-white disabled:opacity-50 ${busy ? "is-busy" : "hover:brightness-110"}`}

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  CheckCircle2,
   ChevronDown,
   Globe,
   ImageIcon,
@@ -16,6 +15,7 @@ import {
   Upload,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useToast } from "@/components/admin/toast";
 
 type FieldType =
   "text" | "email" | "number" | "password" | "textarea" | "asset" | "color";
@@ -261,6 +261,12 @@ export function SettingsForm({
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
+  const toast = useToast();
+  // Saving scrolls nothing into view, so the outcome is announced where the
+  // eye already is rather than under the button that caused it.
+  useEffect(() => {
+    if (message) toast(failed ? "error" : "success", message);
+  }, [message, failed, savedAt, toast]);
   const groups = group === "smtp" ? SMTP_GROUPS : GENERAL_GROUPS;
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
@@ -368,20 +374,9 @@ export function SettingsForm({
 
       {/* The save bar follows the editor down a long form. */}
       <div className="sticky bottom-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-ad-surface/90 px-4 py-3 shadow-ad-lg ring-1 ring-ad-line backdrop-blur-xl">
-        {message ? (
-          <span
-            key={savedAt}
-            role={failed ? "alert" : "status"}
-            className={`animate-rise flex items-center gap-2 text-xs font-medium ${failed ? "text-rose-500" : "text-emerald-600"}`}
-          >
-            <CheckCircle2 size={15} aria-hidden="true" />
-            {message}
-          </span>
-        ) : (
-          <span className="text-xs text-ad-faint">
-            Changes apply to the live website as soon as they are saved.
-          </span>
-        )}
+        <span className="text-xs text-ad-faint">
+          Changes apply to the live website as soon as they are saved.
+        </span>
         <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           {group === "smtp" ? (
             <button

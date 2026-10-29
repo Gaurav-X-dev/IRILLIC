@@ -1,7 +1,7 @@
 /* Uploaded assets use their original CMS URL and intentionally bypass Next image optimization. */
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Copy, FileImage, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -10,6 +10,7 @@ import {
   TableSearch,
   useTableControls,
 } from "@/components/admin/table-controls";
+import { useToast } from "@/components/admin/toast";
 
 function assetKind(mimeType: string) {
   if (mimeType.startsWith("image/")) return "image";
@@ -38,6 +39,10 @@ export function MediaManager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+  }, [error, toast]);
   const router = useRouter();
   const folders = Array.from(
     new Set(assets.map((asset) => asset.folder)),
@@ -248,7 +253,6 @@ export function MediaManager({
                 defaultValue="general"
                 className="h-11 w-full rounded-lg ring-1 ring-ad-line px-3 text-sm"
               />
-              {error ? <p className="text-xs text-red-600">{error}</p> : null}
             </div>
             <button
               disabled={busy}

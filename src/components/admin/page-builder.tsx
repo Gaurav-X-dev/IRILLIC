@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { CONTENT_ICON_NAMES } from "@/lib/content-icons";
 import { fieldMeta, isImageField, orderFields } from "@/lib/field-meta";
 import { SECTION_GROUP_ORDER, sectionMeta } from "@/lib/section-meta";
+import { useToast } from "@/components/admin/toast";
 
 type Page = {
   id: string;
@@ -64,6 +65,11 @@ export function PageBuilder({
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
   const [savedAt, setSavedAt] = useState(0);
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+    else if (message) toast("success", message);
+  }, [error, message, savedAt, toast]);
 
   // Comparing against the stored value is enough to know whether the editor
   // holds unsaved work; the shapes here are small, plain JSON.
@@ -479,25 +485,11 @@ export function PageBuilder({
 
             <footer className="sticky bottom-0 z-10 flex flex-col items-stretch gap-3 border-t border-ad-hairline bg-ad-surface/92 px-4 py-3.5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <div className="min-w-0">
-                {error ? (
-                  <p className="text-xs font-medium text-rose-500" role="alert">
-                    {error}
-                  </p>
-                ) : message ? (
-                  <p
-                    key={savedAt}
-                    className="animate-rise text-xs font-medium text-emerald-600"
-                    role="status"
-                  >
-                    {message}
-                  </p>
-                ) : (
-                  <p className="text-xs text-ad-faint">
-                    {dirty
-                      ? "You have unsaved changes on this section."
-                      : "Changes appear on the public page after saving."}
-                  </p>
-                )}
+                <p className="text-xs text-ad-faint">
+                  {dirty
+                    ? "You have unsaved changes on this section."
+                    : "Changes appear on the public page after saving."}
+                </p>
               </div>
               {readOnly ? (
                 <span className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-ad-sunken px-5 text-xs font-bold text-ad-muted ring-1 ring-ad-line">
@@ -538,6 +530,11 @@ function PageSettings({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const toast = useToast();
+  useEffect(() => {
+    if (feedback)
+      toast(feedback.includes("saved") ? "success" : "error", feedback);
+  }, [feedback, toast]);
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (readOnly) return;

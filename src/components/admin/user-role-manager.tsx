@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  CheckCircle2,
   KeyRound,
   LockKeyhole,
   Pencil,
@@ -21,6 +20,7 @@ import {
   TablePagination,
   useTableControls,
 } from "@/components/admin/table-controls";
+import { useToast } from "@/components/admin/toast";
 
 export interface ManagedUser {
   id: string;
@@ -45,6 +45,11 @@ export function UserRoleManager({
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const toast = useToast();
+  useEffect(() => {
+    if (error) toast("error", error);
+    else if (message) toast("success", message);
+  }, [error, message, toast]);
   const table = useTableControls<ManagedUser>({
     rows: users,
     searchFields: (user) => [user.name, user.email, user.role],
@@ -179,16 +184,6 @@ export function UserRoleManager({
           </button>
         </article>
       </section>
-
-      {error || message ? (
-        <div
-          role={error ? "alert" : "status"}
-          className={`flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-semibold ${error ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-600"}`}
-        >
-          {error ? <X size={15} /> : <CheckCircle2 size={15} />}
-          {error || message}
-        </div>
-      ) : null}
 
       <section className="overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
         <header className="flex flex-col gap-3 border-b border-ad-hairline p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">

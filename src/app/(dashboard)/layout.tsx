@@ -6,6 +6,7 @@ import {
   type AdminTheme,
 } from "@/lib/admin-theme";
 import { PasswordForm } from "@/components/admin/password-form";
+import { ToastProvider } from "@/components/admin/toast";
 import { requireAdmin } from "@/lib/auth";
 import { cmsService } from "@/services/cms.service";
 import { getBranding } from "@/lib/branding";
@@ -56,19 +57,21 @@ export default async function DashboardLayout({
         : "light"
       : themePreference;
   return (
-    <AdminShell
-      admin={{
-        name: admin.name,
-        email: admin.email,
-        role: admin.role,
-        avatar: admin.avatar,
-      }}
-      topbar={topbar}
-      branding={branding}
-      themePreference={themePreference}
-      resolvedTheme={resolvedTheme}
-    >
-      {children}
-    </AdminShell>
+    <ToastProvider>
+      <AdminShell
+        admin={{
+          name: admin.name,
+          email: admin.email,
+          role: admin.role,
+          avatar: admin.avatar,
+        }}
+        topbar={topbar}
+        branding={branding}
+        themePreference={themePreference}
+        resolvedTheme={resolvedTheme}
+      >
+        {children}
+      </AdminShell>
+    </ToastProvider>
   );
 }
