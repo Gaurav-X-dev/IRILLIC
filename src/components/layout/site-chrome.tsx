@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { APP_ROUTE_PREFIXES } from "@/config/navigation";
 import { RevealObserver } from "@/components/shared/reveal-observer";
+import { SmartLink } from "@/components/shared/smart-link";
 
 interface SiteChromeProps {
   header: React.ReactNode;
@@ -24,9 +25,9 @@ export function SiteChrome({ header, footer, children }: SiteChromeProps) {
 
   return (
     <div className="site">
-      <a className="skip-link" href="#main">
+      <SmartLink className="skip-link" href="#main">
         Skip to main content
-      </a>
+      </SmartLink>
       {header}
       {children}
       {footer}

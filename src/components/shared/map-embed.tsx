@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowUpRight, Map as MapIcon, MapPin } from "lucide-react";
+import { SmartLink } from "@/components/shared/smart-link";
 
 /** Privacy-friendly map: Google Maps only loads when the visitor asks for it. */
 export function MapEmbed({ query, label }: { query: string; label: string }) {
@@ -37,11 +38,11 @@ export function MapEmbed({ query, label }: { query: string; label: string }) {
             >
               <MapIcon className="i" aria-hidden="true" /> Load interactive map
             </button>
-            <a className="link" href={openHref} target="_blank" rel="noopener">
+            <SmartLink className="link" href={openHref} target="_blank" rel="noopener">
               Open in Google Maps{" "}
               <ArrowUpRight className="i" aria-hidden="true" />
               <span className="sr-only">(opens in a new tab)</span>
-            </a>
+            </SmartLink>
           </div>
           <p className="map__note">
             The map loads from Google Maps when you choose to view it.

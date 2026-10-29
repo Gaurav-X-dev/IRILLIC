@@ -26,6 +26,7 @@ import {
   contactContentSchema,
   homeContentSchema,
 } from "@/validations/public-content.validation";
+import { SmartLink } from "@/components/shared/smart-link";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
@@ -79,7 +80,7 @@ export default async function HomePage() {
             height={265}
             unoptimized
           />
-          <a
+          <SmartLink
             className="link-pill"
             href={mothersonHealth}
             target="_blank"
@@ -88,7 +89,7 @@ export default async function HomePage() {
             {content.sections.endorsement.linkLabel}{" "}
             <ArrowUpRight className="i" aria-hidden="true" />
             <span className="sr-only">(opens in a new tab)</span>
-          </a>
+          </SmartLink>
         </div>
       </section>
 
@@ -112,10 +113,10 @@ export default async function HomePage() {
                   <Icon className="i pillar__icon" aria-hidden="true" />
                   <h3>{title}</h3>
                   <p>{text}</p>
-                  <a className="link" href={link.href}>
+                  <SmartLink className="link" href={link.href}>
                     {link.label}{" "}
                     <ArrowUpRight className="i" aria-hidden="true" />
-                  </a>
+                  </SmartLink>
                 </article>
               );
             })}
@@ -138,10 +139,10 @@ export default async function HomePage() {
                 <span className="dot">.</span>
               </h2>
               <p>{content.sections.performance.text}</p>
-              <a className="pill" href={content.sections.performance.link.href}>
+              <SmartLink className="pill" href={content.sections.performance.link.href}>
                 {content.sections.performance.link.label}{" "}
                 <Download className="i" aria-hidden="true" />
-              </a>
+              </SmartLink>
             </div>
             <dl className="report__figures">
               {content.figures.map((f) => (
@@ -192,18 +193,18 @@ export default async function HomePage() {
                 <span className="dot">.</span>
               </h2>
             </div>
-            <a
+            <SmartLink
               className="link-pill"
               href={content.sections.divisions.link.href}
             >
               {content.sections.divisions.link.label}{" "}
               <ArrowUpRight className="i" aria-hidden="true" />
-            </a>
+            </SmartLink>
           </header>
 
           <div className="divisions">
             {content.divisions.map((d) => (
-              <a className="division reveal" href={d.href} key={d.title}>
+              <SmartLink className="division reveal" href={d.href} key={d.title}>
                 <span
                   className={
                     d.light
@@ -230,7 +231,7 @@ export default async function HomePage() {
                     </span>
                   </span>
                 </span>
-              </a>
+              </SmartLink>
             ))}
           </div>
         </div>
@@ -254,9 +255,9 @@ export default async function HomePage() {
             <ul className="specialty-links">
               {content.specialtyLinks.map((s) => (
                 <li key={s}>
-                  <a href="#clinical-impact">
+                  <SmartLink href="#clinical-impact">
                     {s} <ArrowUpRight className="i" aria-hidden="true" />
-                  </a>
+                  </SmartLink>
                 </li>
               ))}
             </ul>
@@ -279,13 +280,13 @@ export default async function HomePage() {
                   <p className="label">{item.label}</p>
                   <h3>{item.title}</h3>
                   {item.text ? <p>{item.text}</p> : null}
-                  <a
+                  <SmartLink
                     className="link"
                     href={content.sections.clinical.itemLinkHref}
                   >
                     {content.sections.clinical.itemLinkLabel}{" "}
                     <ArrowRight className="i" aria-hidden="true" />
-                  </a>
+                  </SmartLink>
                 </div>
               </article>
             ))}
@@ -361,7 +362,7 @@ export default async function HomePage() {
                 </>
               );
               return panel.external ? (
-                <a
+                <SmartLink
                   className="panel reveal"
                   href={panel.href === "careers" ? careers : panel.href}
                   target="_blank"
@@ -369,7 +370,7 @@ export default async function HomePage() {
                   key={panel.title}
                 >
                   {body}
-                </a>
+                </SmartLink>
               ) : (
                 <Link
                   className="panel reveal"
@@ -415,14 +416,14 @@ export default async function HomePage() {
                   </li>
                 ))}
               </ul>
-              <a className="pill" href={content.sections.global.link.href}>
+              <SmartLink className="pill" href={content.sections.global.link.href}>
                 {content.sections.global.link.label}{" "}
                 <ArrowRight className="i" aria-hidden="true" />
-              </a>
+              </SmartLink>
             </div>
           </div>
 
-          <a className="address-row reveal" href="#contact">
+          <SmartLink className="address-row reveal" href="#contact">
             <span>
               <span className="address-row__title">
                 {content.sections.global.addressTitle}
@@ -435,7 +436,7 @@ export default async function HomePage() {
               <span />
               <ArrowRight className="i" />
             </span>
-          </a>
+          </SmartLink>
         </div>
       </section>
 
@@ -459,12 +460,12 @@ export default async function HomePage() {
               </li>
               <li>
                 <Mail className="i" aria-hidden="true" />
-                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                <SmartLink href={`mailto:${contact.email}`}>{contact.email}</SmartLink>
               </li>
               {contact.phone ? (
                 <li>
                   <Phone className="i" aria-hidden="true" />
-                  <a href={contact.phoneHref}>{contact.phone}</a>
+                  <SmartLink href={contact.phoneHref}>{contact.phone}</SmartLink>
                 </li>
               ) : null}
             </ul>

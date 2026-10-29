@@ -12,15 +12,16 @@ import {
 import type { NavLink } from "@/types/site.types";
 import type { SiteChromeContent } from "@/validations/public-content.validation";
 import type { Branding } from "@/lib/branding";
+import { SmartLink } from "@/components/shared/smart-link";
 
 function FooterLink({ link }: { link: NavLink }) {
   const icon = <ArrowUpRight className="i" aria-hidden="true" />;
   if (link.external) {
     return (
-      <a href={link.href} target="_blank" rel="noopener">
+      <SmartLink href={link.href} target="_blank" rel="noopener">
         {icon} {link.label}
         <span className="sr-only">(opens in a new tab)</span>
-      </a>
+      </SmartLink>
     );
   }
   return (
@@ -131,12 +132,12 @@ export function Footer({
                 </p>
                 <p>
                   <Mail className="i" aria-hidden="true" />
-                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                  <SmartLink href={`mailto:${contact.email}`}>{contact.email}</SmartLink>
                 </p>
                 {contact.phone ? (
                   <p>
                     <Phone className="i" aria-hidden="true" />
-                    <a href={contact.phoneHref}>{contact.phone}</a>
+                    <SmartLink href={contact.phoneHref}>{contact.phone}</SmartLink>
                   </p>
                 ) : null}
               </address>
@@ -161,7 +162,7 @@ export function Footer({
           <ul>
             {legalLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href}>{link.label}</a>
+                <SmartLink href={link.href}>{link.label}</SmartLink>
               </li>
             ))}
           </ul>

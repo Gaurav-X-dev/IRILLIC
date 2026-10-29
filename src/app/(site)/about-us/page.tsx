@@ -22,6 +22,7 @@ import { SubNav } from "@/components/shared/sub-nav";
 import { getPublishedEntry } from "@/services/cms.service";
 import { cmsMetadata } from "@/lib/cms-metadata";
 import { aboutContentSchema } from "@/validations/public-content.validation";
+import { SmartLink } from "@/components/shared/smart-link";
 
 export const dynamic = "force-dynamic";
 
@@ -159,7 +160,7 @@ export default async function AboutPage() {
                   height={265}
                   unoptimized
                 />
-                <a
+                <SmartLink
                   className="link-pill"
                   href={content.mothersonHealthUrl}
                   target="_blank"
@@ -168,7 +169,7 @@ export default async function AboutPage() {
                   {content.synergyIntro.linkLabel}{" "}
                   <ArrowUpRight className="i" aria-hidden="true" />
                   <span className="sr-only">(opens in a new tab)</span>
-                </a>
+                </SmartLink>
               </div>
             </div>
           </div>

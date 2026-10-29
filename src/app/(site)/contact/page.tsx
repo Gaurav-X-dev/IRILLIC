@@ -19,6 +19,7 @@ import { getPublishedEntry } from "@/services/cms.service";
 import { cmsMetadata } from "@/lib/cms-metadata";
 import { applyGlobalContact, getBranding } from "@/lib/branding";
 import { contactContentSchema } from "@/validations/public-content.validation";
+import { SmartLink } from "@/components/shared/smart-link";
 
 export const dynamic = "force-dynamic";
 
@@ -75,12 +76,12 @@ export default async function ContactPage() {
                 </li>
                 <li>
                   <Mail className="i" aria-hidden="true" />
-                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                  <SmartLink href={`mailto:${contact.email}`}>{contact.email}</SmartLink>
                 </li>
                 {contact.phone ? (
                   <li>
                     <Phone className="i" aria-hidden="true" />
-                    <a href={contact.phoneHref}>{contact.phone}</a>
+                    <SmartLink href={contact.phoneHref}>{contact.phone}</SmartLink>
                   </li>
                 ) : null}
               </ul>
@@ -100,11 +101,11 @@ export default async function ContactPage() {
                   const Icon = networkIcons[icon];
                   return (
                     <li key={label}>
-                      <a href={href} target="_blank" rel="noopener">
+                      <SmartLink href={href} target="_blank" rel="noopener">
                         <Icon className="i" aria-hidden="true" /> {label}{" "}
                         <ArrowUpRight className="i" aria-hidden="true" />
                         <span className="sr-only">(opens in a new tab)</span>
-                      </a>
+                      </SmartLink>
                     </li>
                   );
                 })}
@@ -309,7 +310,7 @@ export default async function ContactPage() {
             {content.enquiries.map(({ icon, title, text, subject }) => {
               const Icon = enquiryIcons[icon];
               return (
-                <a
+                <SmartLink
                   className="enquiry reveal"
                   href={`mailto:${contact.email}?subject=${encodeURIComponent(subject)}`}
                   key={title}
@@ -321,7 +322,7 @@ export default async function ContactPage() {
                     {contact.email}{" "}
                     <ArrowRight className="i" aria-hidden="true" />
                   </em>
-                </a>
+                </SmartLink>
               );
             })}
           </div>

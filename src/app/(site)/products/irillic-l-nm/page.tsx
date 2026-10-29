@@ -26,6 +26,7 @@ import { TabSet, type TabItem } from "@/components/shared/tab-set";
 import { getPublishedEntry } from "@/services/cms.service";
 import { cmsMetadata } from "@/lib/cms-metadata";
 import { lnmDetailContentSchema } from "@/validations/public-content.validation";
+import { SmartLink } from "@/components/shared/smart-link";
 
 export const dynamic = "force-dynamic";
 
@@ -247,7 +248,7 @@ export default async function ProductDetailPage() {
           />
           <div className="docs">
             {content.downloads.map((d) => (
-              <a className="doc reveal" href={d.href} download key={d.title}>
+              <SmartLink className="doc reveal" href={d.href} download key={d.title}>
                 <span className="doc__cat">{d.cat}</span>
                 <span className="doc__title">{d.title}</span>
                 <span className="doc__meta">
@@ -256,7 +257,7 @@ export default async function ProductDetailPage() {
                     <Download className="i" aria-hidden="true" />
                   </span>
                 </span>
-              </a>
+              </SmartLink>
             ))}
           </div>
         </div>

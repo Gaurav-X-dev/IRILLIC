@@ -20,6 +20,7 @@ import { getPublishedEntry } from "@/services/cms.service";
 import { cmsMetadata } from "@/lib/cms-metadata";
 import type { Reference } from "@/types/site.types";
 import { listingPageContentSchema } from "@/validations/public-content.validation";
+import { SmartLink } from "@/components/shared/smart-link";
 
 export async function generateMetadata(): Promise<Metadata> {
   return cmsMetadata(await getPublishedEntry("page", "clinical-applications"));
@@ -119,7 +120,7 @@ export default async function ClinicalApplicationsPage() {
               <ul className="refs">
                 {references.map((r) => (
                   <li key={r.title}>
-                    <a href={pubmedUrl(r.title)} target="_blank" rel="noopener">
+                    <SmartLink href={pubmedUrl(r.title)} target="_blank" rel="noopener">
                       <span className="ref__authors">{r.authors}</span>{" "}
                       <span className="ref__title">{r.title}.</span>{" "}
                       <em>{r.journal}</em>{" "}
@@ -127,7 +128,7 @@ export default async function ClinicalApplicationsPage() {
                       <span className="sr-only">
                         (opens PubMed in a new tab)
                       </span>
-                    </a>
+                    </SmartLink>
                   </li>
                 ))}
               </ul>

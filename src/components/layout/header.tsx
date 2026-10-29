@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import type { MegaSection, NavLink } from "@/types/site.types";
 import type { SiteChromeContent } from "@/validations/public-content.validation";
 import type { Branding } from "@/lib/branding";
+import { SmartLink } from "@/components/shared/smart-link";
 
 const DESKTOP_QUERY = "(min-width: 1101px)";
 
@@ -42,10 +43,10 @@ function MegaLink({
 }) {
   if (link.external) {
     return (
-      <a href={link.href} target="_blank" rel="noopener" onClick={onNavigate}>
+      <SmartLink href={link.href} target="_blank" rel="noopener" onClick={onNavigate}>
         {link.label} <ArrowUpRight className="i" aria-hidden="true" />
         <span className="sr-only">(opens in a new tab)</span>
-      </a>
+      </SmartLink>
     );
   }
   const current = !link.href.includes("#") && pathOf(link.href) === pathname;

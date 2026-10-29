@@ -14,6 +14,7 @@ import {
 import { useHashChange } from "@/hooks/use-hash-change";
 import { pubmedUrl } from "@/lib/site-content";
 import type { Resource, ResourceType } from "@/types/site.types";
+import { SmartLink } from "@/components/shared/smart-link";
 
 type Sort = "new" | "old" | "az";
 type ResourceCopy = {
@@ -53,7 +54,7 @@ function ResourceAction({
 }) {
   if (resource.type === "study") {
     return (
-      <a
+      <SmartLink
         className="pill pill--sm"
         href={pubmedUrl(resource.title)}
         target="_blank"
@@ -62,20 +63,20 @@ function ResourceAction({
         {copy.publicationAction}{" "}
         <ArrowUpRight className="i" aria-hidden="true" />
         <span className="sr-only">({copy.newTabLabel})</span>
-      </a>
+      </SmartLink>
     );
   }
   if (resource.type === "video") {
     return (
-      <a className="pill pill--sm" href={resource.href}>
+      <SmartLink className="pill pill--sm" href={resource.href}>
         {copy.videoAction} <Play className="i i--fill" aria-hidden="true" />
-      </a>
+      </SmartLink>
     );
   }
   return (
-    <a className="pill pill--sm" href={resource.href} download>
+    <SmartLink className="pill pill--sm" href={resource.href} download>
       {copy.downloadAction} <Download className="i" aria-hidden="true" />
-    </a>
+    </SmartLink>
   );
 }
 
