@@ -47,6 +47,9 @@ export function AdminAvatar({
           width={size * 2}
           height={size * 2}
           sizes={`${size}px`}
+          // Uploads are already 512x512 WebP from sharp, so the optimiser has
+          // nothing left to do and only adds a way for this to fail.
+          unoptimized
           onError={() => setFailed(true)}
           className="h-full w-full object-cover"
         />

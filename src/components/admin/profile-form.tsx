@@ -68,8 +68,9 @@ export function ProfileForm({
                 fill
                 sizes="128px"
                 // A freshly chosen file is a blob: URL, which the optimiser
-                // cannot process.
-                unoptimized={preview.startsWith("blob:")}
+                // cannot process; a saved one is already 512x512 WebP, so it
+                // has nothing to gain from it either.
+                unoptimized
                 onError={() => setImageFailed(true)}
                 className="object-cover"
               />
