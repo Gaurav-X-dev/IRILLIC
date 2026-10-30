@@ -10,6 +10,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { useToast } from "@/components/admin/toast";
+import { checkForm } from "@/components/admin/form-validation";
 
 export function ProfileForm({
   profile,
@@ -32,6 +33,8 @@ export function ProfileForm({
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const problem = checkForm(event.currentTarget);
+    if (problem) return setError(problem);
     setBusy(true);
     setError("");
     setSaved(false);
@@ -57,7 +60,8 @@ export function ProfileForm({
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-5 xl:grid-cols-[360px_1fr]">
+    <form
+      noValidate onSubmit={submit} className="grid gap-5 xl:grid-cols-[360px_1fr]">
       <section className="ad-card overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
         <div className="bg-gradient-to-br from-blue-600 via-cyan-600 to-emerald-500 px-6 py-8 text-center text-white">
           <button

@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/table-controls";
 import { useConfirm } from "@/components/admin/confirm";
 import { useToast } from "@/components/admin/toast";
+import { checkForm } from "@/components/admin/form-validation";
 
 type Row = {
   id: string;
@@ -93,6 +94,8 @@ export function ContentManager({
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (readOnly) return;
+    const problem = checkForm(event.currentTarget);
+    if (problem) return setError(problem);
     setBusy(true);
     setError("");
     const form = new FormData(event.currentTarget);
@@ -277,6 +280,7 @@ export function ContentManager({
       {open ? (
         <div className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-slate-950/60 p-2.5 backdrop-blur-sm sm:p-4">
           <form
+      noValidate
             onSubmit={save}
             className="animate-rise my-3 w-full max-w-2xl rounded-2xl bg-ad-raised p-4 shadow-ad-lg ring-1 ring-ad-line sm:my-6 sm:p-6"
           >

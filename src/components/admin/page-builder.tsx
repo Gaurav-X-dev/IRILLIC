@@ -553,6 +553,7 @@ function PageSettings({
       </button>
       {open ? (
         <form
+      noValidate
           onSubmit={save}
           className="animate-rise grid gap-4 border-t border-ad-hairline p-5 sm:grid-cols-2"
         >

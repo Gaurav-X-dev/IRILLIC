@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useToast } from "@/components/admin/toast";
+import { validateSettingValues } from "@/validations/setting.validation";
 
 type FieldType =
   "text" | "email" | "number" | "password" | "textarea" | "asset" | "color";
@@ -332,6 +333,18 @@ export function SettingsForm({
       values.requireTls = values.requireTls === "on";
       values.secure = values.secure === "on";
     }
+    // The same rules the API applies, so the browser says what the server
+    // would have said rather than its own guess at it.
+    try {
+      validateSettingValues(group, values);
+    } catch (cause) {
+      setBusy(false);
+      setFailed(true);
+      setSavedAt(Date.now());
+      return setMessage(
+        cause instanceof Error ? cause.message : "Check the values and retry.",
+      );
+    }
     try {
       const response = await fetch(`/api/admin/settings/${group}`, {
         method: "PUT",
@@ -381,7 +394,8 @@ export function SettingsForm({
   }
 
   return (
-    <form onSubmit={save} className="max-w-5xl space-y-4 pb-4">
+    <form
+      noValidate onSubmit={save} className="max-w-5xl space-y-4 pb-4">
       {group === "general" ? <BrandPreview initial={initial} /> : null}
 
       <div className="stagger space-y-4">

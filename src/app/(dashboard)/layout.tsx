@@ -5,6 +5,7 @@ import {
   isAdminTheme,
   type AdminTheme,
 } from "@/lib/admin-theme";
+import { ShieldAlert } from "lucide-react";
 import { PasswordForm } from "@/components/admin/password-form";
 import { ConfirmProvider } from "@/components/admin/confirm";
 import { ToastProvider } from "@/components/admin/toast";
@@ -21,29 +22,6 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const admin = await requireAdmin();
-  if (admin.mustChangePassword) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-[#f3f6f8] p-4">
-        <div className="w-full max-w-xl rounded-2xl border border-amber-200 bg-white p-6 shadow-xl">
-          <p className="text-xs font-bold uppercase tracking-[.16em] text-amber-700">
-            Security action required
-          </p>
-          <h1 className="mt-2 text-2xl font-bold text-slate-950">
-            Set a secure password
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            The temporary password can only be used to sign in. Choose a unique
-            password before accessing the administration panel.
-          </p>
-          <PasswordForm />
-        </div>
-      </div>
-    );
-  }
-  const [topbar, branding] = await Promise.all([
-    cmsService.adminTopbar(),
-    getBranding(),
-  ]);
   const cookieStore = await cookies();
   const stored = cookieStore.get(ADMIN_THEME_COOKIE)?.value;
   const themePreference: AdminTheme = isAdminTheme(stored) ? stored : "light";
@@ -57,6 +35,43 @@ export default async function DashboardLayout({
         ? "dark"
         : "light"
       : themePreference;
+
+  if (admin.mustChangePassword)
+    // Scoped to .admin-ui like every other panel screen: outside it none of
+    // the --adc-* variables resolve, which left this form -- the submit
+    // button included -- drawn in no colour at all.
+    return (
+      <div
+        className="admin-ui grid min-h-screen place-items-center bg-ad-canvas p-4"
+        data-admin-theme={resolvedTheme}
+      >
+        <div className="w-full max-w-xl">
+          <div className="mb-5 flex items-start gap-3.5">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-500/12 text-amber-600">
+              <ShieldAlert size={20} aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[.16em] text-amber-600">
+                Security action required
+              </p>
+              <h1 className="mt-1 text-2xl font-bold leading-7 text-ad-ink">
+                Set a secure password
+              </h1>
+              <p className="mt-1.5 text-sm leading-6 text-ad-muted">
+                The temporary password can only be used to sign in. Choose a
+                password of your own before opening the panel.
+              </p>
+            </div>
+          </div>
+          <PasswordForm />
+        </div>
+      </div>
+    );
+
+  const [topbar, branding] = await Promise.all([
+    cmsService.adminTopbar(),
+    getBranding(),
+  ]);
   return (
     <AdminShell
       admin={{

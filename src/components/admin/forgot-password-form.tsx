@@ -1,13 +1,16 @@
 "use client";
 import { useState } from "react";
 import { Mail } from "lucide-react";
+import { checkForm } from "@/components/admin/form-validation";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  async function submit(event: React.FormEvent) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const problem = checkForm(event.currentTarget);
+    if (problem) return setMessage(problem);
     setBusy(true);
     const response = await fetch("/api/auth/forgot-password", {
       method: "POST",
@@ -19,7 +22,8 @@ export function ForgotPasswordForm() {
     setBusy(false);
   }
   return (
-    <form className="mt-8" onSubmit={submit}>
+    <form
+      noValidate className="mt-8" onSubmit={submit}>
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold text-ad-muted">
           Administrator email

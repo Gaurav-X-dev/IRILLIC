@@ -285,7 +285,12 @@ export default async function SectionPage({
     );
   }
   if (section === "media") {
-    const rows = await cmsService.listMedia();
+    const [rows, admin] = await Promise.all([
+      cmsService.listMedia(),
+      requireAdmin(),
+    ]);
+    // A Content Reader may look at the library but not add to it.
+    const readOnly = !hasPermission(admin.role, "media:write");
     return (
       <PageFrame
         info={{
@@ -295,7 +300,7 @@ export default async function SectionPage({
             "Organise approved images, videos, documents and brand files.",
         }}
       >
-        <MediaManager assets={rows} />
+        <MediaManager assets={rows} readOnly={readOnly} />
       </PageFrame>
     );
   }

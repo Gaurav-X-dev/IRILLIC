@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, KeyRound, X } from "lucide-react";
+import { checkForm } from "@/components/admin/form-validation";
 
 export function PasswordForm() {
   const router = useRouter();
@@ -25,6 +26,11 @@ export function PasswordForm() {
     setError("");
     setMessage("");
     const form = event.currentTarget;
+    const problem = checkForm(form);
+    if (problem) {
+      setBusy(false);
+      return setError(problem);
+    }
     if (!validNewPassword) {
       setBusy(false);
       return setError("New password does not meet all security requirements.");
@@ -54,6 +60,7 @@ export function PasswordForm() {
   }
   return (
     <form
+      noValidate
       onSubmit={submit}
       className="mt-6 max-w-5xl space-y-5 rounded-2xl bg-ad-surface p-7 shadow-ad-sm ring-1 ring-ad-line"
     >

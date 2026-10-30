@@ -22,6 +22,7 @@ import {
 } from "@/components/admin/table-controls";
 import { useToast } from "@/components/admin/toast";
 import { useConfirm } from "@/components/admin/confirm";
+import { checkForm } from "@/components/admin/form-validation";
 
 export interface ManagedUser {
   id: string;
@@ -105,6 +106,8 @@ export function UserRoleManager({
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!editor) return;
+    const problem = checkForm(event.currentTarget);
+    if (problem) return setError(problem);
     const form = new FormData(event.currentTarget);
     const creating = editor === "new";
     const payload = creating
@@ -411,6 +414,7 @@ function UserEditor({
   return (
     <div className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-slate-950/65 p-3 backdrop-blur-sm">
       <form
+      noValidate
         onSubmit={onSubmit}
         className="animate-rise w-full max-w-lg rounded-2xl bg-ad-raised p-5 shadow-ad-lg ring-1 ring-ad-line sm:p-6"
       >

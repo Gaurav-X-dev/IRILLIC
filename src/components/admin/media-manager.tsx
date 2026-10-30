@@ -11,6 +11,7 @@ import {
   useTableControls,
 } from "@/components/admin/table-controls";
 import { useToast } from "@/components/admin/toast";
+import { checkForm } from "@/components/admin/form-validation";
 
 function assetKind(mimeType: string) {
   if (mimeType.startsWith("image/")) return "image";
@@ -75,6 +76,8 @@ export function MediaManager({
   async function upload(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (readOnly) return;
+    const problem = checkForm(event.currentTarget);
+    if (problem) return setError(problem);
     setBusy(true);
     setError("");
     const response = await fetch("/api/admin/media", {
@@ -205,6 +208,7 @@ export function MediaManager({
       {open ? (
         <div className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-slate-950/60 p-2.5 sm:p-4">
           <form
+      noValidate
             onSubmit={upload}
             className="animate-rise w-full max-w-lg rounded-2xl bg-ad-raised p-4 shadow-ad-lg ring-1 ring-ad-line sm:p-6"
           >

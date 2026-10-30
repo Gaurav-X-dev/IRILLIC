@@ -112,7 +112,7 @@ async function storeFile(
 
 export async function POST(request: Request) {
   try {
-    const auth = await authorizeAdminApi();
+    const auth = await authorizeAdminApi({ permission: "media:write" });
     if (auth.response || !auth.session) return auth.response;
     const form = await request.formData();
     const files = form
