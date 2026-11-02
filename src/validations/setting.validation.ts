@@ -7,23 +7,31 @@ import { z } from "zod";
  * visible to every visitor until somebody notices.
  */
 
-/** Digits, with the punctuation a written phone number is allowed to carry. */
+/**
+ * An Indian mobile number: a fixed +91 country code and ten national digits.
+ *
+ * The panel offers the code as a fixed prefix and takes only the ten digits,
+ * so every stored number has the same shape and the website's tel: link is
+ * dialable without guessing what the editor meant. An empty value is allowed —
+ * it hides the phone number from the site.
+ */
 export const phoneSchema = z
   .string()
   .trim()
   .max(24, "Phone number must be 24 characters or fewer")
-  // Characters first, then how many digits they add up to, so each failure
-  // reports the thing the editor actually got wrong.
   .refine(
-    (value) => value === "" || /^\+?[\d\s()./-]*$/.test(value),
-    "Phone number may contain digits, spaces and + ( ) - . only",
+    (value) => value === "" || /^\+91[\s-]?[0-9][\s-]?[0-9\s-]*$/.test(value),
+    "Phone number must start with the +91 country code",
   )
   .refine((value) => {
     if (value === "") return true;
-    const digits = value.match(/\d/g)?.length ?? 0;
-    // E.164 allows at most 15 digits worldwide; fewer than 7 is not dialable.
-    return digits >= 7 && digits <= 15;
-  }, "Phone number must have between 7 and 15 digits");
+    return value.replace(/[^0-9]/g, "").replace(/^91/, "").length === 10;
+  }, "Enter exactly 10 digits after +91")
+  .refine((value) => {
+    if (value === "") return true;
+    const national = value.replace(/[^0-9]/g, "").replace(/^91/, "");
+    return /^[6-9]/.test(national);
+  }, "An Indian mobile number starts with 6, 7, 8 or 9");
 
 export const emailSchema = z
   .string()
@@ -128,11 +136,19 @@ export function validateSettingValues(
 }
 
 export class SettingValidationError extends Error {
+  /**
+   * The reason on its own, without the field name in front of it. A banner has
+   * to say which field it is about; the message printed under that very field
+   * does not, and reads as a stutter when it does.
+   */
+  readonly reason: string;
+
   constructor(
     readonly field: string,
     reason: string,
   ) {
     super(`${settingLabel(field)}: ${reason}`);
     this.name = "SettingValidationError";
+    this.reason = reason;
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -13,15 +13,27 @@ import {
   ServerCog,
   Settings2,
   Upload,
+  AlertCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useToast } from "@/components/admin/toast";
-import { validateSettingValues } from "@/validations/setting.validation";
-import { checkForm } from "@/components/admin/form-validation";
+import {
+  SettingValidationError,
+  settingLabel,
+  validateSettingValues,
+} from "@/validations/setting.validation";
+import { firstProblem } from "@/components/admin/form-validation";
 import { Req, RequiredNote } from "@/components/admin/ui";
 
 type FieldType =
-  "text" | "email" | "number" | "password" | "textarea" | "asset" | "color";
+  | "text"
+  | "email"
+  | "number"
+  | "password"
+  | "textarea"
+  | "asset"
+  | "color"
+  | "phone";
 
 interface Field {
   name: string;
@@ -288,14 +300,8 @@ const GENERAL_GROUPS: FieldGroup[] = [
       {
         name: "phone",
         label: "Contact phone",
-        placeholder: "+91 …",
-        type: "text",
-        // The lookahead counts digits; the rest limits which characters
-        // may sit between them.
-        pattern: "(?=(?:[^0-9]*[0-9]){7,15}[^0-9]*$)\+?[0-9\s()./-]{7,24}",
-        title: "Between 7 and 15 digits, with optional + ( ) - . and spaces.",
-        maxLength: 24,
-        hint: "Include the country code, for example +91 76520 68867.",
+        type: "phone",
+        hint: "The +91 country code is fixed. Enter the ten digits that follow it.",
         usedOn: "Homepage, contact page and global footer",
       },
     ],
@@ -303,7 +309,7 @@ const GENERAL_GROUPS: FieldGroup[] = [
 ];
 
 const INPUT_CLASS =
-  "h-11 w-full rounded-xl bg-ad-surface px-3.5 text-sm text-ad-ink outline-none ring-1 ring-ad-line placeholder:text-ad-faint focus:ring-ad-accent";
+  "h-11 w-full rounded-xl bg-ad-surface px-3.5 text-sm text-ad-ink outline-none placeholder:text-ad-faint";
 
 export function SettingsForm({
   group,
@@ -318,6 +324,14 @@ export function SettingsForm({
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [savedAt, setSavedAt] = useState(0);
+  // A toast alone was not enough: it fades, and on a long form the field it
+  // refers to is usually off screen, so saving looked like it simply did
+  // nothing. The offending field is now named, marked and scrolled to.
+  const [fieldError, setFieldError] = useState<{
+    name: string;
+    message: string;
+  } | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const toast = useToast();
   // Saving scrolls nothing into view, so the outcome is announced where the
   // eye already is rather than under the button that caused it.
@@ -326,19 +340,37 @@ export function SettingsForm({
   }, [message, failed, savedAt, toast]);
   const groups = group === "smtp" ? SMTP_GROUPS : GENERAL_GROUPS;
 
+  // The section holding the field expands first, so this waits a frame before
+  // scrolling — a field in a collapsed panel has no position to scroll to.
+  useEffect(() => {
+    if (!fieldError) return;
+    const frame = window.requestAnimationFrame(() => {
+      const field = formRef.current?.querySelector<HTMLElement>(
+        `[name="${CSS.escape(fieldError.name)}"]`,
+      );
+      field?.scrollIntoView({ block: "center", behavior: "smooth" });
+      field?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [fieldError]);
+
+  function reportField(name: string, message: string) {
+    setFieldError({ name, message });
+    setFailed(true);
+    setSavedAt(Date.now());
+    setMessage(`${settingLabel(name)}: ${message}`);
+  }
+
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     // The asterisks now promise these fields are checked, so they are checked
     // here rather than only by the server.
-    const problem = checkForm(event.currentTarget);
-    if (problem) {
-      setFailed(true);
-      setSavedAt(Date.now());
-      return setMessage(problem);
-    }
+    const problem = firstProblem(event.currentTarget);
+    if (problem) return reportField(problem.el.name, problem.message);
     setBusy(true);
     setMessage("");
     setFailed(false);
+    setFieldError(null);
     const entries = Object.fromEntries(
       new FormData(event.currentTarget).entries(),
     );
@@ -346,6 +378,14 @@ export function SettingsForm({
       Object.fromEntries(
         Object.entries(entries).map(([key, value]) => [key, String(value)]),
       );
+    if (group === "general") {
+      // The box holds only the national number; the stored value carries the
+      // country code and the grouping the website prints.
+      const digits = String(values.phone ?? "").replace(/[^0-9]/g, "");
+      values.phone = digits
+        ? `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`
+        : "";
+    }
     if (group === "smtp") {
       values.port = Number(values.port || 587);
       values.requireTls = values.requireTls === "on";
@@ -357,6 +397,8 @@ export function SettingsForm({
       validateSettingValues(group, values);
     } catch (cause) {
       setBusy(false);
+      if (cause instanceof SettingValidationError)
+        return reportField(cause.field, cause.reason);
       setFailed(true);
       setSavedAt(Date.now());
       return setMessage(
@@ -370,6 +412,18 @@ export function SettingsForm({
         body: JSON.stringify({ values }),
       });
       const result = await response.json();
+      // The API names the field it rejected, so a rule the browser does not
+      // know about still lands on the right box.
+      if (!response.ok && typeof result.field === "string") {
+        setBusy(false);
+        return reportField(
+          result.field,
+          String(result.error ?? "").replace(
+            new RegExp(`^${settingLabel(result.field)}:\s*`),
+            "",
+          ) || "This value is not valid",
+        );
+      }
       setFailed(!response.ok);
       setMessage(
         response.ok
@@ -412,7 +466,12 @@ export function SettingsForm({
   }
 
   return (
-    <form noValidate onSubmit={save} className="max-w-5xl space-y-4 pb-4">
+    <form
+      ref={formRef}
+      noValidate
+      onSubmit={save}
+      className="max-w-5xl space-y-4 pb-4"
+    >
       {group === "general" ? <BrandPreview initial={initial} /> : null}
       <RequiredNote />
 
@@ -423,6 +482,7 @@ export function SettingsForm({
             fieldGroup={fieldGroup}
             initial={initial}
             media={media}
+            fieldError={fieldError}
           />
         ))}
       </div>
@@ -483,13 +543,25 @@ function SettingsSection({
   fieldGroup,
   initial,
   media,
+  fieldError,
 }: {
   fieldGroup: FieldGroup;
   initial: Record<string, unknown>;
   media: MediaOption[];
+  fieldError: { name: string; message: string } | null;
 }) {
   const [open, setOpen] = useState(true);
   const Icon = fieldGroup.icon;
+  const ownsError = Boolean(
+    fieldError &&
+    fieldGroup.fields.some((field) => field.name === fieldError.name),
+  );
+
+  // A rejected field inside a section the editor had collapsed is a field they
+  // cannot see, so the section opens itself.
+  useEffect(() => {
+    if (ownsError) setOpen(true);
+  }, [ownsError, fieldError]);
 
   return (
     <section className="ad-card overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
@@ -525,6 +597,9 @@ function SettingsSection({
                 field={field}
                 value={initial[field.name]}
                 media={media}
+                error={
+                  fieldError?.name === field.name ? fieldError.message : null
+                }
               />
             ))}
           </div>
@@ -599,12 +674,20 @@ function SettingField({
   field,
   value,
   media,
+  error,
 }: {
   field: Field;
   value: unknown;
   media: MediaOption[];
+  error: string | null;
 }) {
   const initialValue = String(value ?? "");
+  const errorId = error ? `${field.name}-error` : undefined;
+  // The ring is the only thing that marks the field once the page has scrolled
+  // to it, so it replaces the usual hairline rather than sitting beside it.
+  const ring = error
+    ? "ring-2 ring-rose-500 focus:ring-rose-500"
+    : "ring-1 ring-ad-line focus:ring-ad-accent";
 
   return (
     <label className={field.full ? "sm:col-span-2" : undefined}>
@@ -621,7 +704,9 @@ function SettingField({
           maxLength={field.maxLength}
           defaultValue={initialValue}
           placeholder={field.placeholder}
-          className="w-full rounded-xl bg-ad-surface p-3.5 text-sm leading-6 text-ad-ink outline-none ring-1 ring-ad-line placeholder:text-ad-faint focus:ring-ad-accent"
+          aria-invalid={Boolean(error)}
+          aria-describedby={errorId}
+          className={`w-full rounded-xl bg-ad-surface p-3.5 text-sm leading-6 text-ad-ink outline-none placeholder:text-ad-faint ${ring}`}
         />
       ) : field.type === "asset" ? (
         <AssetField
@@ -630,6 +715,8 @@ function SettingField({
           required={field.required}
           initialValue={initialValue}
           media={media}
+          error={error}
+          errorId={errorId}
         />
       ) : field.type === "color" ? (
         <span className="flex items-center gap-3">
@@ -643,6 +730,14 @@ function SettingField({
             {initialValue || "#ffffff"}
           </span>
         </span>
+      ) : field.type === "phone" ? (
+        <PhoneField
+          name={field.name}
+          label={field.label}
+          initialValue={initialValue}
+          error={error}
+          errorId={errorId}
+        />
       ) : (
         <input
           name={field.name}
@@ -657,9 +752,21 @@ function SettingField({
           min={field.min}
           max={field.max}
           required={field.required}
-          className={INPUT_CLASS}
+          aria-invalid={Boolean(error)}
+          aria-describedby={errorId}
+          className={`${INPUT_CLASS} ${ring}`}
         />
       )}
+      {error ? (
+        <span
+          id={errorId}
+          role="alert"
+          className="mt-1.5 flex items-start gap-1.5 text-[11px] font-semibold leading-5 text-rose-500"
+        >
+          <AlertCircle size={12} className="mt-[3px] shrink-0" />
+          {error}
+        </span>
+      ) : null}
       {field.hint ? (
         <span className="mt-1.5 block text-[11px] leading-5 text-ad-faint">
           {field.hint}
@@ -675,6 +782,77 @@ function SettingField({
   );
 }
 
+/** The ten national digits inside a stored number such as "+91 76520 68867". */
+function nationalDigits(stored: string): string {
+  const digits = stored.replace(/[^0-9]/g, "");
+  return digits.length > 10 ? digits.slice(-10) : digits;
+}
+
+/**
+ * An Indian mobile number, as a fixed +91 and ten editable digits.
+ *
+ * A free text box invited "+91-765 206 8867", "0765 206 8867" and
+ * "917652068867", all of which reach the website's tel: link differently.
+ * Fixing the country code and taking only the ten digits after it means there
+ * is one shape to validate and one shape to print.
+ */
+function PhoneField({
+  name,
+  label,
+  initialValue,
+  error,
+  errorId,
+}: {
+  name: string;
+  label: string;
+  initialValue: string;
+  error: string | null;
+  errorId?: string;
+}) {
+  const [digits, setDigits] = useState(() => nationalDigits(initialValue));
+  const incomplete = digits.length > 0 && digits.length < 10;
+
+  return (
+    <>
+      <span
+        className={`flex items-stretch overflow-hidden rounded-xl bg-ad-surface ${
+          error
+            ? "ring-2 ring-rose-500"
+            : "ring-1 ring-ad-line focus-within:ring-ad-accent"
+        }`}
+      >
+        <span className="grid shrink-0 place-items-center border-r border-ad-line bg-ad-sunken px-3.5 text-sm font-semibold text-ad-muted">
+          +91
+        </span>
+        <input
+          name={name}
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel-national"
+          aria-label={label}
+          value={digits}
+          onChange={(event) =>
+            setDigits(event.target.value.replace(/[^0-9]/g, "").slice(0, 10))
+          }
+          placeholder="76520 68867"
+          pattern="[6-9][0-9]{9}"
+          title="Enter the ten digits that follow +91, starting with 6, 7, 8 or 9."
+          maxLength={10}
+          aria-invalid={Boolean(error)}
+          aria-describedby={errorId}
+          className="h-11 w-full bg-transparent px-3.5 text-sm text-ad-ink outline-none placeholder:text-ad-faint"
+        />
+      </span>
+      <span
+        className={`mt-1.5 block text-[11px] leading-5 ${incomplete ? "text-amber-600" : "text-ad-faint"}`}
+      >
+        {digits.length}/10 digits
+        {digits.length === 0 ? " — leave empty to hide the phone number" : ""}
+      </span>
+    </>
+  );
+}
+
 /**
  * An image path with a live thumbnail. Uploaded assets are offered through a
  * datalist, so the path can either be chosen or typed by hand.
@@ -685,12 +863,16 @@ function AssetField({
   required,
   initialValue,
   media,
+  error,
+  errorId,
 }: {
   name: string;
   label: string;
   required?: boolean;
   initialValue: string;
   media: MediaOption[];
+  error: string | null;
+  errorId?: string;
 }) {
   const [value, setValue] = useState(initialValue);
   const listId = `${name}-assets`;
@@ -724,7 +906,9 @@ function AssetField({
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="/images/logo/irillic-logo-blue.png"
-          className={INPUT_CLASS}
+          aria-invalid={Boolean(error)}
+          aria-describedby={errorId}
+          className={`${INPUT_CLASS} ${error ? "ring-2 ring-rose-500 focus:ring-rose-500" : "ring-1 ring-ad-line focus:ring-ad-accent"}`}
         />
       </span>
       {images.length ? (

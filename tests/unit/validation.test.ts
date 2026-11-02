@@ -13,6 +13,12 @@ import {
   enquiryInputSchema,
 } from "../../src/validations/cms.validation";
 import { validateKnownCmsContent } from "../../src/validations/public-content.validation";
+import {
+  SettingValidationError,
+  phoneSchema,
+  validateSettingValues,
+} from "../../src/validations/setting.validation";
+import { uploadLimitMb } from "../../src/lib/upload-limits";
 
 test("public URLs reject executable and protocol-relative values", () => {
   for (const value of [
@@ -177,4 +183,47 @@ test("known page content is structurally validated", () => {
   assert.doesNotThrow(() =>
     validateKnownCmsContent("resource", "custom", { arbitrary: true }),
   );
+});
+
+test("a contact phone must be +91 followed by ten mobile digits", () => {
+  const accepted = ["", "+91 76520 68867", "+917652068867", "+91-98765-43210"];
+  for (const value of accepted)
+    assert.equal(
+      phoneSchema.safeParse(value).success,
+      true,
+      `${value || "(empty)"} should be accepted`,
+    );
+
+  const rejected: [string, RegExp][] = [
+    ["7652068867", /\+91 country code/],
+    ["+91 7652 0688", /exactly 10 digits/],
+    ["+91 76520 688671", /exactly 10 digits/],
+    ["+91 56520 68867", /starts with 6, 7, 8 or 9/],
+  ];
+  for (const [value, expected] of rejected) {
+    const result = phoneSchema.safeParse(value);
+    assert.equal(result.success, false, `${value} should be rejected`);
+    assert.match(result.error!.issues[0].message, expected);
+  }
+});
+
+test("a setting is rejected with the field it belongs to", () => {
+  assert.throws(
+    () => validateSettingValues("general", { supportEmail: "not-an-email" }),
+    (error: unknown) => {
+      assert.ok(error instanceof SettingValidationError);
+      // The panel marks the box with `field` and prints `reason` beneath it,
+      // so an editor is taken to the problem rather than reading a banner.
+      assert.equal(error.field, "supportEmail");
+      assert.equal(error.reason, "Enter a valid email address");
+      assert.equal(error.message, "Support email: Enter a valid email address");
+      return true;
+    },
+  );
+});
+
+test("an upload limit is raised for video only", () => {
+  assert.equal(uploadLimitMb("video/mp4"), 20);
+  assert.equal(uploadLimitMb("image/png"), 10);
+  assert.equal(uploadLimitMb("application/pdf"), 10);
 });
