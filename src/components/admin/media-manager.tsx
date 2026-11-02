@@ -2,7 +2,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useEffect, useState } from "react";
-import { Check, Copy, FileImage, FileText, Upload, X } from "lucide-react";
+import {
+  Check,
+  Copy,
+  FileImage,
+  FileText,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   TableFilter,
@@ -11,6 +19,7 @@ import {
   useTableControls,
 } from "@/components/admin/table-controls";
 import { useToast } from "@/components/admin/toast";
+import { useConfirm } from "@/components/admin/confirm";
 import { checkForm } from "@/components/admin/form-validation";
 import { Req, RequiredNote } from "@/components/admin/ui";
 import {
@@ -46,6 +55,8 @@ export function MediaManager({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState("");
+  const confirm = useConfirm();
   const toast = useToast();
   useEffect(() => {
     if (error) toast("error", error);
@@ -106,6 +117,28 @@ export function MediaManager({
         </span>
       );
     return <FileImage size={32} className="text-ad-faint" aria-hidden="true" />;
+  }
+
+  async function remove(asset: Asset) {
+    if (readOnly) return;
+    const ok = await confirm({
+      title: `Delete ${asset.name}?`,
+      message:
+        "The file is removed from the library and from the server. It can be uploaded again, but any page still pointing at it would show a broken image — so the panel checks for that first.",
+      confirmLabel: "Delete file",
+      tone: "danger",
+    });
+    if (!ok) return;
+    setBusyId(asset.id);
+    const response = await fetch(`/api/admin/media/${asset.id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    setBusyId("");
+    if (!response.ok)
+      return toast("error", result.error || "The file could not be deleted.");
+    toast("success", result.message || "File deleted.");
+    router.refresh();
   }
 
   async function copyUrl(asset: Asset) {
@@ -224,18 +257,31 @@ export function MediaManager({
                       {asset.folder} · {asset.mimeType}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => copyUrl(asset)}
-                    aria-label={`Copy the URL for ${asset.name}`}
-                    className="shrink-0 rounded-lg ring-1 ring-ad-line p-2 text-ad-faint transition hover:border-cyan-300 hover:text-ad-accent"
-                  >
-                    {copied === asset.id ? (
-                      <Check size={14} className="text-emerald-600" />
-                    ) : (
-                      <Copy size={14} />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => copyUrl(asset)}
+                      aria-label={`Copy the URL for ${asset.name}`}
+                      className="rounded-lg p-2 text-ad-faint ring-1 ring-ad-line transition hover:text-ad-accent hover:ring-ad-accent/60"
+                    >
+                      {copied === asset.id ? (
+                        <Check size={14} className="text-emerald-600" />
+                      ) : (
+                        <Copy size={14} />
+                      )}
+                    </button>
+                    {readOnly ? null : (
+                      <button
+                        type="button"
+                        onClick={() => remove(asset)}
+                        disabled={busyId === asset.id}
+                        aria-label={`Delete ${asset.name}`}
+                        className="rounded-lg p-2 text-rose-500 ring-1 ring-rose-500/20 transition hover:bg-rose-500/10 disabled:opacity-40"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     )}
-                  </button>
+                  </div>
                 </div>
               </article>
             ))}
