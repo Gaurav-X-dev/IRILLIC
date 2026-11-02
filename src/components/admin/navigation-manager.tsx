@@ -11,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { MegaSection, NavLink } from "@/types/site.types";
-
+import { Req } from "@/components/admin/ui";
 
 export function NavigationManager({
   sectionId,
@@ -48,7 +48,41 @@ export function NavigationManager({
     setMenus(copy);
     setSelected(target);
   }
+  /**
+   * The asterisks in this builder promise the tab cannot be saved half
+   * finished, so the empty one is named before the request is made — the
+   * server would otherwise accept a blank label and hide the tab on the site.
+   */
+  function missingRequired(): string | null {
+    for (const [index, item] of menus.entries()) {
+      const where = `tab ${index + 1}`;
+      if (!item.label.trim()) return `Tab label is required on ${where}.`;
+      if (!item.key.trim()) return `Unique key is required on ${where}.`;
+      if (!item.heading.trim()) return `Heading is required on ${where}.`;
+      if (!item.cta.label.trim())
+        return `Button label is required on ${where}.`;
+      if (!item.cta.href.trim()) return `Button URL is required on ${where}.`;
+      for (const [c, col] of item.columns.entries()) {
+        if (!col.title.trim())
+          return `Column heading is required on column ${c + 1} of ${where}.`;
+        for (const [l, navLink] of col.links.entries()) {
+          if (!navLink.label.trim())
+            return `Label is required on link ${l + 1} of column ${c + 1}, ${where}.`;
+          if (!navLink.href.trim())
+            return `URL is required on link ${l + 1} of column ${c + 1}, ${where}.`;
+        }
+      }
+      if (!item.feature.title.trim())
+        return `Featured card title is required on ${where}.`;
+      if (!item.feature.href.trim())
+        return `Featured card destination URL is required on ${where}.`;
+    }
+    return null;
+  }
+
   async function save() {
+    const problem = missingRequired();
+    if (problem) return setNotice(problem);
     setBusy(true);
     setNotice("");
     try {
@@ -157,11 +191,13 @@ export function NavigationManager({
                 <Grid>
                   <Field
                     label="Tab label"
+                    required
                     value={menu.label}
                     set={(label) => update({ label })}
                   />
                   <Field
                     label="Unique key"
+                    required
                     value={menu.key}
                     set={(key) => update({ key: slug(key) })}
                   />
@@ -184,6 +220,7 @@ export function NavigationManager({
               >
                 <Field
                   label="Heading"
+                  required
                   value={menu.heading}
                   set={(heading) => update({ heading })}
                 />
@@ -195,11 +232,13 @@ export function NavigationManager({
                 <Grid>
                   <Field
                     label="Button label"
+                    required
                     value={menu.cta.label}
                     set={(label) => update({ cta: { ...menu.cta, label } })}
                   />
                   <Field
                     label="Button URL"
+                    required
                     value={menu.cta.href}
                     set={(href) => update({ cta: { ...menu.cta, href } })}
                   />
@@ -214,6 +253,7 @@ export function NavigationManager({
                   >
                     <Field
                       label="Column heading"
+                      required
                       value={col.title}
                       set={(title) => column(c as 0 | 1, { title })}
                     />
@@ -224,11 +264,13 @@ export function NavigationManager({
                       >
                         <Field
                           label="Label"
+                          required
                           value={ln.label}
                           set={(label) => link(c as 0 | 1, i, { label })}
                         />
                         <Field
                           label="URL"
+                          required
                           value={ln.href}
                           set={(href) => link(c as 0 | 1, i, { href })}
                         />
@@ -275,6 +317,7 @@ export function NavigationManager({
                   />
                   <Field
                     label="Title"
+                    required
                     value={menu.feature.title}
                     set={(title) =>
                       update({ feature: { ...menu.feature, title } })
@@ -289,6 +332,7 @@ export function NavigationManager({
                   />
                   <Field
                     label="Destination URL"
+                    required
                     value={menu.feature.href}
                     set={(href) =>
                       update({ feature: { ...menu.feature, href } })
@@ -303,7 +347,8 @@ export function NavigationManager({
               </Box>
               <div className="flex items-center justify-between border-t pt-5">
                 <p className="text-xs text-ad-muted">
-                  {notice || "Fill valid URLs, then save."}
+                  {notice ||
+                    "Fields marked * are required. Fill valid URLs, then save."}
                 </p>
                 <button
                   onClick={save}
@@ -352,16 +397,18 @@ function Field({
   value,
   set,
   placeholder,
+  required,
 }: {
   label: string;
   value: string;
   set: (v: string) => void;
   placeholder?: string;
+  required?: boolean;
 }) {
   return (
     <label>
       <span className="mb-1.5 block text-[11px] font-semibold text-ad-muted">
-        {label}
+        {label} {required ? <Req /> : null}
       </span>
       <input
         value={value}

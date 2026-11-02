@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, KeyRound, X } from "lucide-react";
 import { checkForm } from "@/components/admin/form-validation";
+import { Req, RequiredNote } from "@/components/admin/ui";
 
 export function PasswordForm() {
   const router = useRouter();
@@ -78,10 +79,12 @@ export function PasswordForm() {
           </p>
         </div>
       </div>
+      <RequiredNote />
       <label className="block text-xs font-semibold text-ad-muted">
-        Current password
+        Current password <Req />
         <input
           name="currentPassword"
+          aria-label="Current password"
           type="password"
           autoComplete="current-password"
           required
@@ -90,9 +93,10 @@ export function PasswordForm() {
         />
       </label>
       <label className="block text-xs font-semibold text-ad-muted">
-        New password
+        New password <Req />
         <input
           name="newPassword"
+          aria-label="New password"
           type="password"
           autoComplete="new-password"
           required
@@ -104,9 +108,10 @@ export function PasswordForm() {
         />
       </label>
       <label className="block text-xs font-semibold text-ad-muted">
-        Confirm new password
+        Confirm new password <Req />
         <input
           name="confirmPassword"
+          aria-label="Confirm new password"
           type="password"
           autoComplete="new-password"
           required

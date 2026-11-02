@@ -13,6 +13,7 @@ import {
 import { useConfirm } from "@/components/admin/confirm";
 import { useToast } from "@/components/admin/toast";
 import { checkForm } from "@/components/admin/form-validation";
+import { Req, RequiredNote } from "@/components/admin/ui";
 
 type Row = {
   id: string;
@@ -280,7 +281,7 @@ export function ContentManager({
       {open ? (
         <div className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-slate-950/60 p-2.5 backdrop-blur-sm sm:p-4">
           <form
-      noValidate
+            noValidate
             onSubmit={save}
             className="animate-rise my-3 w-full max-w-2xl rounded-2xl bg-ad-raised p-4 shadow-ad-lg ring-1 ring-ad-line sm:my-6 sm:p-6"
           >
@@ -302,6 +303,7 @@ export function ContentManager({
               </button>
             </div>
             <div className="space-y-4">
+              <RequiredNote />
               <Field
                 name="title"
                 label="Title"
@@ -412,7 +414,7 @@ function Field({
   return (
     <label className="block">
       <span className="mb-2 block text-xs font-semibold text-ad-muted">
-        {label}
+        {label} {required ? <Req /> : null}
       </span>
       <input
         name={name}

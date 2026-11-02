@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/table-controls";
 import { useToast } from "@/components/admin/toast";
 import { checkForm } from "@/components/admin/form-validation";
+import { Req, RequiredNote } from "@/components/admin/ui";
 
 function assetKind(mimeType: string) {
   if (mimeType.startsWith("image/")) return "image";
@@ -208,7 +209,7 @@ export function MediaManager({
       {open ? (
         <div className="fixed inset-0 z-[70] grid place-items-center overflow-y-auto bg-slate-950/60 p-2.5 sm:p-4">
           <form
-      noValidate
+            noValidate
             onSubmit={upload}
             className="animate-rise w-full max-w-lg rounded-2xl bg-ad-raised p-4 shadow-ad-lg ring-1 ring-ad-line sm:p-6"
           >
@@ -219,9 +220,14 @@ export function MediaManager({
               </button>
             </div>
             <div className="mt-6 space-y-4">
+              <RequiredNote />
+              <span className="block text-xs font-semibold text-ad-muted">
+                File <Req />
+              </span>
               <input
                 name="file"
                 type="file"
+                aria-label="File"
                 required
                 multiple
                 onChange={(event) =>

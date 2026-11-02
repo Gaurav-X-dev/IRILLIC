@@ -139,7 +139,10 @@ export default async function HomePage() {
                 <span className="dot">.</span>
               </h2>
               <p>{content.sections.performance.text}</p>
-              <SmartLink className="pill" href={content.sections.performance.link.href}>
+              <SmartLink
+                className="pill"
+                href={content.sections.performance.link.href}
+              >
                 {content.sections.performance.link.label}{" "}
                 <Download className="i" aria-hidden="true" />
               </SmartLink>
@@ -204,7 +207,11 @@ export default async function HomePage() {
 
           <div className="divisions">
             {content.divisions.map((d) => (
-              <SmartLink className="division reveal" href={d.href} key={d.title}>
+              <SmartLink
+                className="division reveal"
+                href={d.href}
+                key={d.title}
+              >
                 <span
                   className={
                     d.light
@@ -416,7 +423,10 @@ export default async function HomePage() {
                   </li>
                 ))}
               </ul>
-              <SmartLink className="pill" href={content.sections.global.link.href}>
+              <SmartLink
+                className="pill"
+                href={content.sections.global.link.href}
+              >
                 {content.sections.global.link.label}{" "}
                 <ArrowRight className="i" aria-hidden="true" />
               </SmartLink>
@@ -460,12 +470,16 @@ export default async function HomePage() {
               </li>
               <li>
                 <Mail className="i" aria-hidden="true" />
-                <SmartLink href={`mailto:${contact.email}`}>{contact.email}</SmartLink>
+                <SmartLink href={`mailto:${contact.email}`}>
+                  {contact.email}
+                </SmartLink>
               </li>
               {contact.phone ? (
                 <li>
                   <Phone className="i" aria-hidden="true" />
-                  <SmartLink href={contact.phoneHref}>{contact.phone}</SmartLink>
+                  <SmartLink href={contact.phoneHref}>
+                    {contact.phone}
+                  </SmartLink>
                 </li>
               ) : null}
             </ul>
@@ -479,6 +493,13 @@ export default async function HomePage() {
               successMessage={content.contactForm.successMessage}
               resetLabel={content.contactForm.resetLabel}
             >
+              <p className="form__intro">
+                Fields marked{" "}
+                <span className="req" aria-hidden="true">
+                  *
+                </span>
+                <span className="sr-only"> with an asterisk</span> are required.
+              </p>
               <div className="form__grid">
                 <div className="field">
                   <label htmlFor="c-name">

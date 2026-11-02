@@ -3,13 +3,9 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Camera,
-  Save,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
+import { Camera, Save, ShieldCheck, UserRound } from "lucide-react";
 import { useToast } from "@/components/admin/toast";
+import { Req, RequiredNote } from "@/components/admin/ui";
 import { checkForm } from "@/components/admin/form-validation";
 
 export function ProfileForm({
@@ -61,7 +57,10 @@ export function ProfileForm({
 
   return (
     <form
-      noValidate onSubmit={submit} className="grid gap-5 xl:grid-cols-[360px_1fr]">
+      noValidate
+      onSubmit={submit}
+      className="grid gap-5 xl:grid-cols-[360px_1fr]"
+    >
       <section className="ad-card overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
         <div className="bg-gradient-to-br from-blue-600 via-cyan-600 to-emerald-500 px-6 py-8 text-center text-white">
           <button
@@ -127,10 +126,11 @@ export function ProfileForm({
             if (file) setPreview(URL.createObjectURL(file));
           }}
         />
-        <div className="mt-7 grid gap-5 sm:grid-cols-2">
+        <RequiredNote className="mt-7" />
+        <div className="mt-3 grid gap-5 sm:grid-cols-2">
           <label className="block">
             <span className="mb-2 block text-xs font-semibold text-ad-muted">
-              Full name
+              Full name <Req />
             </span>
             <input
               name="name"
@@ -143,7 +143,7 @@ export function ProfileForm({
           </label>
           <label className="block">
             <span className="mb-2 block text-xs font-semibold text-ad-muted">
-              Email address
+              Email address <Req />
             </span>
             <input
               name="email"

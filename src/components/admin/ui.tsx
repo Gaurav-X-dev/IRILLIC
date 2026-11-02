@@ -237,3 +237,29 @@ export function EmptyState({
     </div>
   );
 }
+
+/**
+ * The asterisk beside a field that must be filled in. Every admin form uses
+ * this one mark, so "required" looks the same on every screen, and the panel's
+ * own validator strips it back out before naming the field in an alert.
+ */
+export function Req() {
+  return (
+    <>
+      <span className="font-bold text-rose-500" aria-hidden="true">
+        *
+      </span>
+      <span className="sr-only"> (required)</span>
+    </>
+  );
+}
+
+/** The note that explains the asterisk, shown once near the top of a form. */
+export function RequiredNote({ className = "" }: { className?: string }) {
+  return (
+    <p className={`text-[11px] leading-5 text-ad-faint ${className}`}>
+      Fields marked <span className="font-bold text-rose-500">*</span> are
+      required.
+    </p>
+  );
+}

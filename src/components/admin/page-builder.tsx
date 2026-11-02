@@ -17,6 +17,7 @@ import { CONTENT_ICON_NAMES } from "@/lib/content-icons";
 import { fieldMeta, isImageField, orderFields } from "@/lib/field-meta";
 import { SECTION_GROUP_ORDER, sectionMeta } from "@/lib/section-meta";
 import { useToast } from "@/components/admin/toast";
+import { Req, RequiredNote } from "@/components/admin/ui";
 
 type Page = {
   id: string;
@@ -553,11 +554,14 @@ function PageSettings({
       </button>
       {open ? (
         <form
-      noValidate
+          noValidate
           onSubmit={save}
           className="animate-rise grid gap-4 border-t border-ad-hairline p-5 sm:grid-cols-2"
         >
-          <FieldLabel label="Page title">
+          <div className="sm:col-span-2">
+            <RequiredNote />
+          </div>
+          <FieldLabel label="Page title" required>
             <input
               name="title"
               required
@@ -813,16 +817,18 @@ export function VisualEditor({
 
 function FieldLabel({
   label,
+  required,
   children,
 }: {
   label: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   const meta = fieldMeta(label);
   return (
     <label className="block">
       <span className="mb-1.5 block text-[11px] font-semibold text-ad-muted">
-        {meta.label}
+        {meta.label} {required ? <Req /> : null}
       </span>
       {children}
       {meta.hint ? (

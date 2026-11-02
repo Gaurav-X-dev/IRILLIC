@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { Req } from "@/components/admin/ui";
 
 export default function ResetPasswordPage() {
   const params = useSearchParams();
@@ -47,7 +48,14 @@ export default function ResetPasswordPage() {
         </div>
       ) : (
         <form onSubmit={submit} className="mt-8">
+          <label
+            htmlFor="new-password"
+            className="mb-1.5 block text-xs font-semibold text-ad-muted"
+          >
+            New password <Req />
+          </label>
           <input
+            id="new-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

@@ -13,7 +13,14 @@ function labelFor(el: Field) {
     el.getAttribute("aria-label") ??
     el.getAttribute("placeholder") ??
     el.closest("label")?.textContent?.trim().split("\n")[0];
-  if (explicit) return explicit.replace(/[:*]\s*$/, "").trim();
+  // Labels now carry a required asterisk and a screen-reader "(required)"
+  // suffix; neither belongs in the sentence the panel shows.
+  if (explicit)
+    return explicit
+      .replace(/\(required\)/gi, "")
+      .replace(/[:*]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
   const spaced = el.name.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }

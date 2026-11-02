@@ -13,9 +13,24 @@ function tomorrowISO(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+/** The field's own label, with the required asterisk taken back off. */
+function labelFor(el: Field): string {
+  const text =
+    el.closest(".field")?.querySelector("label")?.textContent ??
+    el.getAttribute("aria-label") ??
+    el.getAttribute("placeholder") ??
+    el.name;
+  return text
+    .replace(/\(required\)/gi, "")
+    .replace(/[*:]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function messageFor(el: Field): string {
   const value = el.value.trim();
   const custom = el.getAttribute("data-msg");
+  const label = labelFor(el);
   if (el instanceof HTMLInputElement && el.type === "checkbox") {
     return !el.required || el.checked
       ? ""
@@ -25,8 +40,8 @@ function messageFor(el: Field): string {
     return (
       custom ||
       (el instanceof HTMLSelectElement
-        ? "Please choose an option."
-        : "Please complete this field.")
+        ? `Please choose a ${label.toLowerCase()}.`
+        : `${label} is required.`)
     );
   }
   if (!value) return "";
@@ -35,7 +50,7 @@ function messageFor(el: Field): string {
     el.type === "email" &&
     !EMAIL.test(value)
   )
-    return "Please enter a valid email address.";
+    return `${label} must be a valid email address.`;
   if (el instanceof HTMLInputElement && el.type === "tel") {
     const digits = value.replace(/\D/g, "");
     if (
@@ -43,7 +58,7 @@ function messageFor(el: Field): string {
       digits.length > 13 ||
       !/^[+\d\s()-]+$/.test(value)
     )
-      return "Please enter a valid phone number.";
+      return `${label} must be a valid phone number.`;
   }
   const min = Number(el.getAttribute("minlength"));
   if (min && value.length < min)
@@ -124,13 +139,26 @@ export function ValidatedForm({
     return ok;
   };
 
-  /* future-date minimums and ?param prefills */
+  /* required marks, future-date minimums and ?param prefills */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const all = Array.from(
       formRef.current?.querySelectorAll<Field>("input, select, textarea") ?? [],
     );
     all.forEach((el) => {
+      // A page that already writes its own mark keeps it; the rest get one
+      // here, so "required" looks the same on every form on the site.
+      const label = el.closest(".field")?.querySelector("label");
+      if (el.required && label && !label.querySelector(".req")) {
+        const mark = document.createElement("span");
+        mark.className = "req";
+        mark.setAttribute("aria-hidden", "true");
+        mark.textContent = "*";
+        const reader = document.createElement("span");
+        reader.className = "sr-only";
+        reader.textContent = " (required)";
+        label.append(" ", mark, reader);
+      }
       if (el instanceof HTMLInputElement && el.hasAttribute("data-future"))
         el.min = tomorrowISO();
       const key = el.getAttribute("data-prefill");

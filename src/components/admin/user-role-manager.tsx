@@ -23,6 +23,7 @@ import {
 import { useToast } from "@/components/admin/toast";
 import { useConfirm } from "@/components/admin/confirm";
 import { checkForm } from "@/components/admin/form-validation";
+import { Req, RequiredNote } from "@/components/admin/ui";
 
 export interface ManagedUser {
   id: string;
@@ -411,10 +412,11 @@ function UserEditor({
   onClose: () => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }) {
+  const disabledAccount = Boolean(user) && user?.isActive === false;
   return (
     <div className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-slate-950/65 p-3 backdrop-blur-sm">
       <form
-      noValidate
+        noValidate
         onSubmit={onSubmit}
         className="animate-rise w-full max-w-lg rounded-2xl bg-ad-raised p-5 shadow-ad-lg ring-1 ring-ad-line sm:p-6"
       >
@@ -437,7 +439,8 @@ function UserEditor({
           </button>
         </header>
         <div className="mt-5 space-y-4">
-          <FormField label="Full name">
+          <RequiredNote />
+          <FormField label="Full name" required>
             <input
               name="name"
               required
@@ -445,7 +448,7 @@ function UserEditor({
               className="h-11 w-full rounded-xl bg-ad-surface px-3.5 text-sm outline-none ring-1 ring-ad-line focus:ring-ad-accent"
             />
           </FormField>
-          <FormField label="Email address">
+          <FormField label="Email address" required>
             <input
               name="email"
               type="email"
@@ -458,6 +461,7 @@ function UserEditor({
             label={
               user ? "New temporary password (optional)" : "Temporary password"
             }
+            required={!user}
           >
             <div className="relative">
               <KeyRound
@@ -468,15 +472,27 @@ function UserEditor({
                 name="temporaryPassword"
                 type="password"
                 required={!user}
+                disabled={disabledAccount}
                 minLength={12}
                 autoComplete="new-password"
-                className="h-11 w-full rounded-xl bg-ad-surface pl-9 pr-3.5 text-sm outline-none ring-1 ring-ad-line focus:ring-ad-accent"
+                className="h-11 w-full rounded-xl bg-ad-surface pl-9 pr-3.5 text-sm outline-none ring-1 ring-ad-line focus:ring-ad-accent disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
           </FormField>
           <p className="rounded-xl bg-ad-sunken px-3 py-2.5 text-[10px] leading-5 text-ad-faint">
-            Minimum 12 characters with uppercase, lowercase, number and symbol.
-            The reader must replace a temporary password after signing in.
+            {disabledAccount ? (
+              <>
+                This account is <strong>disabled</strong>, so no password can be
+                set for it. Enable it from the directory first — a disabled
+                reader cannot sign in or recover a password.
+              </>
+            ) : (
+              <>
+                Minimum 12 characters with uppercase, lowercase, number and
+                symbol. The reader must replace a temporary password after
+                signing in.
+              </>
+            )}
           </p>
           {error ? <p className="text-xs text-rose-500">{error}</p> : null}
         </div>
@@ -502,15 +518,17 @@ function UserEditor({
 
 function FormField({
   label,
+  required,
   children,
 }: {
   label: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-xs font-semibold text-ad-muted">
-        {label}
+        {label} {required ? <Req /> : null}
       </span>
       {children}
     </label>

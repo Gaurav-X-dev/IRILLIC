@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Req } from "@/components/admin/ui";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +58,7 @@ export default function LoginPage() {
       <form className="mt-8 space-y-4" onSubmit={submit}>
         <label className="block">
           <span className="mb-1.5 block text-xs font-semibold text-ad-muted">
-            Email address
+            Email address <Req />
           </span>
           <span className="relative block">
             <Mail
@@ -80,7 +81,7 @@ export default function LoginPage() {
         <label className="block">
           <span className="mb-1.5 flex items-center justify-between gap-3">
             <span className="text-xs font-semibold text-ad-muted">
-              Password
+              Password <Req />
             </span>
             <Link
               href="/forgot-password"

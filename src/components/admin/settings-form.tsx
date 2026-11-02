@@ -17,6 +17,8 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useToast } from "@/components/admin/toast";
 import { validateSettingValues } from "@/validations/setting.validation";
+import { checkForm } from "@/components/admin/form-validation";
+import { Req, RequiredNote } from "@/components/admin/ui";
 
 type FieldType =
   "text" | "email" | "number" | "password" | "textarea" | "asset" | "color";
@@ -68,6 +70,7 @@ const SMTP_GROUPS: FieldGroup[] = [
         type: "text",
         minLength: 3,
         maxLength: 255,
+        required: true,
       },
       {
         name: "port",
@@ -76,6 +79,7 @@ const SMTP_GROUPS: FieldGroup[] = [
         type: "number",
         min: 1,
         max: 65535,
+        required: true,
       },
       {
         name: "username",
@@ -111,6 +115,7 @@ const SMTP_GROUPS: FieldGroup[] = [
         label: "From email",
         placeholder: "no-reply@irillic.com",
         type: "email",
+        required: true,
       },
       {
         name: "notificationEmail",
@@ -188,24 +193,28 @@ const GENERAL_GROUPS: FieldGroup[] = [
         name: "logo",
         label: "Primary logo",
         type: "asset",
+        required: true,
         usedOn: "Website header, admin sidebar, sign-in screen",
       },
       {
         name: "logoWhite",
         label: "Logo for dark backgrounds",
         type: "asset",
+        required: true,
         usedOn: "The dark panel on the sign-in screen",
       },
       {
         name: "logoFooter",
         label: "Footer logo",
         type: "asset",
+        required: true,
         usedOn: "Website footer — clear it to reuse the primary logo",
       },
       {
         name: "favicon",
         label: "Browser icon (favicon)",
         type: "asset",
+        required: true,
         usedOn: "The browser tab and bookmarks",
       },
     ],
@@ -219,6 +228,7 @@ const GENERAL_GROUPS: FieldGroup[] = [
         name: "themeColor",
         label: "Browser theme colour",
         type: "color",
+        required: true,
         hint: "Tints the browser chrome on Android and iOS.",
       },
     ],
@@ -272,6 +282,7 @@ const GENERAL_GROUPS: FieldGroup[] = [
         label: "Support email",
         placeholder: "info@irillic.com",
         type: "email",
+        required: true,
         usedOn: "Homepage, contact page, footer and enquiry notifications",
       },
       {
@@ -282,8 +293,7 @@ const GENERAL_GROUPS: FieldGroup[] = [
         // The lookahead counts digits; the rest limits which characters
         // may sit between them.
         pattern: "(?=(?:[^0-9]*[0-9]){7,15}[^0-9]*$)\+?[0-9\s()./-]{7,24}",
-        title:
-          "Between 7 and 15 digits, with optional + ( ) - . and spaces.",
+        title: "Between 7 and 15 digits, with optional + ( ) - . and spaces.",
         maxLength: 24,
         hint: "Include the country code, for example +91 76520 68867.",
         usedOn: "Homepage, contact page and global footer",
@@ -318,6 +328,14 @@ export function SettingsForm({
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // The asterisks now promise these fields are checked, so they are checked
+    // here rather than only by the server.
+    const problem = checkForm(event.currentTarget);
+    if (problem) {
+      setFailed(true);
+      setSavedAt(Date.now());
+      return setMessage(problem);
+    }
     setBusy(true);
     setMessage("");
     setFailed(false);
@@ -394,9 +412,9 @@ export function SettingsForm({
   }
 
   return (
-    <form
-      noValidate onSubmit={save} className="max-w-5xl space-y-4 pb-4">
+    <form noValidate onSubmit={save} className="max-w-5xl space-y-4 pb-4">
       {group === "general" ? <BrandPreview initial={initial} /> : null}
+      <RequiredNote />
 
       <div className="stagger space-y-4">
         {groups.map((fieldGroup) => (
@@ -591,12 +609,16 @@ function SettingField({
   return (
     <label className={field.full ? "sm:col-span-2" : undefined}>
       <span className="mb-1.5 block text-xs font-semibold text-ad-muted">
-        {field.label}
+        {field.label} {field.required ? <Req /> : null}
       </span>
       {field.type === "textarea" ? (
         <textarea
           name={field.name}
+          aria-label={field.label}
           rows={3}
+          required={field.required}
+          minLength={field.minLength}
+          maxLength={field.maxLength}
           defaultValue={initialValue}
           placeholder={field.placeholder}
           className="w-full rounded-xl bg-ad-surface p-3.5 text-sm leading-6 text-ad-ink outline-none ring-1 ring-ad-line placeholder:text-ad-faint focus:ring-ad-accent"
@@ -604,6 +626,8 @@ function SettingField({
       ) : field.type === "asset" ? (
         <AssetField
           name={field.name}
+          label={field.label}
+          required={field.required}
           initialValue={initialValue}
           media={media}
         />
@@ -623,6 +647,7 @@ function SettingField({
         <input
           name={field.name}
           type={field.type}
+          aria-label={field.label}
           defaultValue={initialValue}
           placeholder={field.placeholder}
           pattern={field.pattern}
@@ -656,10 +681,14 @@ function SettingField({
  */
 function AssetField({
   name,
+  label,
+  required,
   initialValue,
   media,
 }: {
   name: string;
+  label: string;
+  required?: boolean;
   initialValue: string;
   media: MediaOption[];
 }) {
@@ -686,6 +715,11 @@ function AssetField({
         <input
           name={name}
           type="text"
+          // The surrounding <label> also wraps the library picker and the
+          // hints, so the field names itself rather than letting the panel's
+          // validator read all of that back as the field name.
+          aria-label={label}
+          required={required}
           list={images.length ? listId : undefined}
           value={value}
           onChange={(event) => setValue(event.target.value)}
@@ -728,7 +762,9 @@ function AssetField({
           rel="noopener"
           className="text-ad-accent underline"
         >
-          {images.length ? "Manage the media library" : "Upload to the media library"}
+          {images.length
+            ? "Manage the media library"
+            : "Upload to the media library"}
         </Link>
         <span className="sr-only">(opens in a new tab)</span>
       </span>

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import { checkForm } from "@/components/admin/form-validation";
+import { Req } from "@/components/admin/ui";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -22,11 +23,10 @@ export function ForgotPasswordForm() {
     setBusy(false);
   }
   return (
-    <form
-      noValidate className="mt-8" onSubmit={submit}>
+    <form noValidate className="mt-8" onSubmit={submit}>
       <label className="block">
         <span className="mb-1.5 block text-xs font-semibold text-ad-muted">
-          Administrator email
+          Administrator email <Req />
         </span>
         <span className="relative block">
           <Mail
