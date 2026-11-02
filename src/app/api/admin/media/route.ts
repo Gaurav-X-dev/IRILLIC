@@ -67,10 +67,15 @@ async function storeFile(
   file: File,
   meta: { folder: string; name: string; altText: string },
 ): Promise<Stored> {
-  const fail = (error: string): Stored => ({ ok: false, name: file.name, error });
+  const fail = (error: string): Stored => ({
+    ok: false,
+    name: file.name,
+    error,
+  });
   let extension = allowed.get(file.type);
   if (!extension) return fail("Unsupported file type");
-  if (file.size > 10 * 1024 * 1024) return fail("File must be 10 MB or smaller");
+  if (file.size > 10 * 1024 * 1024)
+    return fail("File must be 10 MB or smaller");
   const source = Buffer.from(await file.arrayBuffer());
   const isImage = file.type.startsWith("image/");
   if (!isImage && !hasExpectedFileSignature(file.type, source))
@@ -117,7 +122,9 @@ export async function POST(request: Request) {
     const form = await request.formData();
     const files = form
       .getAll("file")
-      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+      .filter(
+        (entry): entry is File => entry instanceof File && entry.size > 0,
+      );
     if (!files.length)
       return NextResponse.json(
         { success: false, error: "Choose at least one file" },
@@ -157,7 +164,12 @@ export async function POST(request: Request) {
         { status: 415 },
       );
     return NextResponse.json(
-      { success: true, data: single ? stored[0] : stored, stored: stored.length, failed },
+      {
+        success: true,
+        data: single ? stored[0] : stored,
+        stored: stored.length,
+        failed,
+      },
       { status: 201 },
     );
   } catch (error) {

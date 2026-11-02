@@ -224,7 +224,6 @@ export function SessionManager() {
           />
           Refresh
         </button>
-
       </div>
 
       <div className="ad-card overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">

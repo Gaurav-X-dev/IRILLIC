@@ -162,7 +162,6 @@ export function AuditLogViewer() {
           />
           Refresh
         </button>
-
       </div>
 
       {error ? (

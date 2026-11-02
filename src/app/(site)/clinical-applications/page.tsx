@@ -120,7 +120,11 @@ export default async function ClinicalApplicationsPage() {
               <ul className="refs">
                 {references.map((r) => (
                   <li key={r.title}>
-                    <SmartLink href={pubmedUrl(r.title)} target="_blank" rel="noopener">
+                    <SmartLink
+                      href={pubmedUrl(r.title)}
+                      target="_blank"
+                      rel="noopener"
+                    >
                       <span className="ref__authors">{r.authors}</span>{" "}
                       <span className="ref__title">{r.title}.</span>{" "}
                       <em>{r.journal}</em>{" "}

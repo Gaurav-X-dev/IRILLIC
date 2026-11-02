@@ -76,12 +76,16 @@ export default async function ContactPage() {
                 </li>
                 <li>
                   <Mail className="i" aria-hidden="true" />
-                  <SmartLink href={`mailto:${contact.email}`}>{contact.email}</SmartLink>
+                  <SmartLink href={`mailto:${contact.email}`}>
+                    {contact.email}
+                  </SmartLink>
                 </li>
                 {contact.phone ? (
                   <li>
                     <Phone className="i" aria-hidden="true" />
-                    <SmartLink href={contact.phoneHref}>{contact.phone}</SmartLink>
+                    <SmartLink href={contact.phoneHref}>
+                      {contact.phone}
+                    </SmartLink>
                   </li>
                 ) : null}
               </ul>

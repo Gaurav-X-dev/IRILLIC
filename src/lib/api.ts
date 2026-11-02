@@ -22,8 +22,7 @@ export function zodMessage(error: ZodError) {
   if (!issue) return "Invalid request";
   const label = fieldLabel(issue.path);
   let reason = issue.message;
-  if (issue.code === "invalid_type")
-    reason = `expected ${issue.expected}`;
+  if (issue.code === "invalid_type") reason = `expected ${issue.expected}`;
   else if (issue.code === "invalid_value" || issue.code === "invalid_union")
     reason = "this value is not one of the accepted options";
   else if (reason.startsWith("Invalid option"))

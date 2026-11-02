@@ -38,7 +38,12 @@ export function MapEmbed({ query, label }: { query: string; label: string }) {
             >
               <MapIcon className="i" aria-hidden="true" /> Load interactive map
             </button>
-            <SmartLink className="link" href={openHref} target="_blank" rel="noopener">
+            <SmartLink
+              className="link"
+              href={openHref}
+              target="_blank"
+              rel="noopener"
+            >
               Open in Google Maps{" "}
               <ArrowUpRight className="i" aria-hidden="true" />
               <span className="sr-only">(opens in a new tab)</span>

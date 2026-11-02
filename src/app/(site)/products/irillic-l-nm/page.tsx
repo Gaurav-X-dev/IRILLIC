@@ -248,7 +248,12 @@ export default async function ProductDetailPage() {
           />
           <div className="docs">
             {content.downloads.map((d) => (
-              <SmartLink className="doc reveal" href={d.href} download key={d.title}>
+              <SmartLink
+                className="doc reveal"
+                href={d.href}
+                download
+                key={d.title}
+              >
                 <span className="doc__cat">{d.cat}</span>
                 <span className="doc__title">{d.title}</span>
                 <span className="doc__meta">

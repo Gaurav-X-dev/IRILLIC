@@ -153,7 +153,6 @@ export function SecurityEventViewer() {
           />
           Refresh
         </button>
-
       </div>
 
       {error ? (
