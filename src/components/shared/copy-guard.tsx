@@ -11,6 +11,11 @@ import { useEffect } from "react";
  * visitor must still be able to select, cut and paste what they are typing
  * into an enquiry, and blocking that would break the forms.
  *
+ * The selection lock itself is plain CSS on `.site` (see site.css) rather than
+ * a class added from here: a lock that only works once JavaScript has run is a
+ * lock that does not work on the first paint, or at all if the bundle is slow.
+ * This component adds the part CSS cannot do — the events and shortcuts.
+ *
  * This is a deterrent, not a secret: anything a browser renders can still be
  * read from the page source, so nothing confidential should be published here.
  */
@@ -25,11 +30,6 @@ function inEditable(target: EventTarget | null): boolean {
 
 export function CopyGuard() {
   useEffect(() => {
-    // The class carries the CSS half of this; adding it from here means a
-    // visitor with JavaScript disabled keeps a selectable, working page
-    // rather than one that is locked with no way to use the forms.
-    document.documentElement.classList.add("is-copy-guarded");
-
     const block = (event: Event) => {
       if (inEditable(event.target)) return;
       event.preventDefault();
@@ -61,7 +61,6 @@ export function CopyGuard() {
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
-      document.documentElement.classList.remove("is-copy-guarded");
       events.forEach((name) => document.removeEventListener(name, block));
       document.removeEventListener("keydown", onKeyDown);
     };

@@ -4213,34 +4213,31 @@ dialog.modal[open] {
 /* ---------------------------------------------------------------------------
    Content protection
 
-   The class is added by <CopyGuard />, so these rules only apply once the
-   script that pairs with them is running. Form fields keep normal selection:
-   a visitor has to be able to correct what they typed into an enquiry.
+   Scoped to .site, the public website's shell, so the lock does not depend on
+   a class that JavaScript has to add first and does not reach the panel, where
+   an administrator has to be able to copy what they are editing. Form fields
+   keep normal selection: a visitor has to be able to correct what they typed
+   into an enquiry, and locking that would break every form on the site.
    --------------------------------------------------------------------------- */
-.is-copy-guarded body {
+.site {
   -webkit-user-select: none;
   -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
 }
-.is-copy-guarded input,
-.is-copy-guarded textarea,
-.is-copy-guarded select,
-.is-copy-guarded [contenteditable="true"] {
+.site input,
+.site textarea,
+.site select,
+.site [contenteditable="true"] {
   -webkit-user-select: text;
   -moz-user-select: text;
+  -ms-user-select: text;
   user-select: text;
 }
-.is-copy-guarded img,
-.is-copy-guarded svg,
-.is-copy-guarded video {
+.site img,
+.site svg,
+.site video {
   -webkit-user-drag: none;
-  pointer-events: none;
-}
-/* Links and buttons wrapping an image must still be clickable. */
-.is-copy-guarded a img,
-.is-copy-guarded button img,
-.is-copy-guarded a svg,
-.is-copy-guarded button svg {
-  pointer-events: auto;
+  user-select: none;
 }
