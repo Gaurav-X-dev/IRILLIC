@@ -44,6 +44,30 @@ export async function POST(request: Request) {
         { success: false, error: "This reset link is invalid or expired." },
         { status: 400 },
       );
+    // The account may have been disabled after the link was issued. Spending
+    // the token here would hand a revoked reader a working password.
+    const [owner] = await db
+      .select({ isActive: users.isActive })
+      .from(users)
+      .where(eq(users.id, reset.userId))
+      .limit(1);
+    if (!owner?.isActive) {
+      await db.insert(securityEvents).values({
+        event: "password_reset_refused",
+        ipAddress: clientIp(request),
+        userAgent: request.headers.get("user-agent"),
+        success: false,
+        metadata: { reason: "account_disabled" },
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "This account has been disabled. Contact your administrator for access.",
+        },
+        { status: 403 },
+      );
+    }
     await db.transaction(async (tx) => {
       await tx
         .update(users)

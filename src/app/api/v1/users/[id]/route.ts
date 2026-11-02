@@ -47,6 +47,18 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         { status: 409 },
       );
     const input = updateContentReaderSchema.parse(await request.json());
+    // A disabled account has no way in, so giving it a fresh temporary
+    // password only leaves a live credential waiting on a dead account.
+    // Re-enabling it in the same request is fine.
+    if (input.temporaryPassword && !current.isActive && input.isActive !== true)
+      return NextResponse.json<ApiResponse>(
+        {
+          success: false,
+          error:
+            "This account is disabled. Enable it before setting a new password.",
+        },
+        { status: 409 },
+      );
     const user = await userService.updateContentReader(id, input);
     if (input.isActive === false || input.temporaryPassword)
       await db

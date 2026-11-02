@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { passwordResetTokens, securityEvents, users } from "@/db/schema";
 import { apiError, clientIp } from "@/lib/api";
 import { sendMail } from "@/services/mail.service";
+import { renderEmail } from "@/services/email-template";
 
 export async function POST(request: Request) {
   const generic = {
@@ -33,17 +34,23 @@ export async function POST(request: Request) {
       .max(255)
       .safeParse(body.email);
     const email = emailResult.success ? emailResult.data.toLowerCase() : "";
-    const [user] = await db
+    const [found] = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
+    // A disabled account cannot sign in, so it cannot recover a password
+    // either: issuing a link would let a revoked reader set a new password and
+    // leave a usable credential behind the moment the account is re-enabled.
+    const user = found?.isActive ? found : undefined;
     await db.insert(securityEvents).values({
       event: "password_reset_requested",
       email,
       ipAddress,
       userAgent: request.headers.get("user-agent"),
       success: Boolean(user),
+      metadata:
+        found && !found.isActive ? { refused: "account_disabled" } : undefined,
     });
     if (!user) return NextResponse.json(generic);
     await db
@@ -63,12 +70,22 @@ export async function POST(request: Request) {
     const base = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
     const link = `${base}/reset-password?token=${encodeURIComponent(token)}`;
     try {
-      await sendMail({
-        to: user.email,
-        subject: "Reset your IRILLIC admin password",
-        text: `Open this link within 30 minutes: ${link}`,
-        html: `<p>A password reset was requested for the IRILLIC admin portal.</p><p><a href="${link}">Reset password</a></p><p>This link expires in 30 minutes.</p>`,
-      });
+      const message = await renderEmail(
+        "Reset your administration password",
+        {
+          eyebrow: "Account recovery",
+          heading: "Reset your password",
+          paragraphs: [
+            `Hello ${user.name},`,
+            "A password reset was requested for your administration account. Choose a new password using the button below.",
+            "If you did not request this, you can ignore this message — your current password stays active and nothing has changed.",
+          ],
+          button: { label: "Reset password", href: link },
+          note: "For your security this link expires 30 minutes after it was requested and can only be used once.",
+        },
+        new URL(request.url).origin,
+      );
+      await sendMail({ to: user.email, ...message });
     } catch (mailError) {
       console.error("Password reset email could not be sent", mailError);
     }
