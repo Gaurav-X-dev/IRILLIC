@@ -5,6 +5,7 @@ import { enquiries, securityEvents } from "@/db/schema";
 import { apiError, clientIp } from "@/lib/api";
 import { enquiryInputSchema } from "@/validations/cms.validation";
 import { sendMail } from "@/services/mail.service";
+import { renderEmail } from "@/services/email-template";
 import { getSettingGroup } from "@/services/settings.service";
 
 export async function POST(request: Request) {
@@ -55,12 +56,28 @@ export async function POST(request: Request) {
       const recipient = String(
         smtp.notificationEmail || general.supportEmail || "",
       );
-      if (recipient)
-        await sendMail({
-          to: recipient,
-          subject: `[IRILLIC] ${input.subject}`,
-          text: `Name: ${input.name}\nEmail: ${input.email}\nPhone: ${input.phone || "-"}\nOrganisation: ${input.organisation || "-"}\n\n${input.message}`,
-        });
+      if (recipient) {
+        const message = await renderEmail(
+          `New website enquiry — ${input.subject}`,
+          {
+            eyebrow: "Website enquiry",
+            heading: input.subject,
+            paragraphs: [
+              `${input.name} submitted the ${input.kind} form on the website. Their details are below; reply to them directly at ${input.email}.`,
+            ],
+            details: [
+              { label: "Name", value: input.name },
+              { label: "Email", value: input.email },
+              { label: "Phone", value: input.phone || "—" },
+              { label: "Organisation", value: input.organisation || "—" },
+              { label: "Message", value: input.message },
+            ],
+            note: "This enquiry is also recorded in the administration panel under Enquiries.",
+          },
+          new URL(request.url).origin,
+        );
+        await sendMail({ to: recipient, ...message });
+      }
     } catch (mailError) {
       console.error("Enquiry stored but notification email failed", mailError);
     }
