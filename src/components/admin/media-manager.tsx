@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useEffect, useState } from "react";
-import { Check, Copy, FileImage, Upload, X } from "lucide-react";
+import { Check, Copy, FileImage, FileText, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   TableFilter,
@@ -69,6 +69,44 @@ export function MediaManager({
     initialSort: "updatedAt",
     pageSize: 12,
   });
+
+  /**
+   * What the tile shows for the file.
+   *
+   * A video used to fall through to the generic file icon, so the library
+   * could not say which clip it was holding. It plays here instead: the first
+   * frame stands in for a thumbnail, and an editor can check the footage is
+   * the right one without leaving the panel. Metadata only is preloaded, so a
+   * page of videos does not download itself.
+   */
+  function AssetPreview({ asset }: { asset: Asset }) {
+    const kind = assetKind(asset.mimeType);
+    if (kind === "image")
+      return (
+        <img src={asset.url} alt="" className="h-full w-full object-cover" />
+      );
+    if (kind === "video")
+      return (
+        <video
+          src={asset.url}
+          controls
+          playsInline
+          preload="metadata"
+          aria-label={asset.name}
+          className="h-full w-full bg-black object-contain"
+        />
+      );
+    if (kind === "document")
+      return (
+        <span className="grid place-items-center gap-2 text-ad-faint">
+          <FileText size={32} aria-hidden="true" />
+          <span className="text-[10px] font-bold uppercase tracking-[.14em]">
+            PDF
+          </span>
+        </span>
+      );
+    return <FileImage size={32} className="text-ad-faint" aria-hidden="true" />;
+  }
 
   async function copyUrl(asset: Asset) {
     try {
@@ -175,15 +213,7 @@ export function MediaManager({
             {table.rows.map((asset) => (
               <article key={asset.id} className="bg-ad-surface p-5">
                 <div className="grid aspect-[16/9] place-items-center overflow-hidden rounded-xl bg-ad-sunken">
-                  {asset.mimeType.startsWith("image/") ? (
-                    <img
-                      src={asset.url}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <FileImage size={32} className="text-ad-faint" />
-                  )}
+                  <AssetPreview asset={asset} />
                 </div>
                 <div className="mt-4 flex items-start justify-between gap-3">
                   <div className="min-w-0">
