@@ -58,6 +58,11 @@ export default async function SectionPage({
   params: Promise<{ section: string }>;
 }) {
   const { section } = await params;
+  const admin = await requireAdmin();
+  // One decision for the whole screen: a Content Reader may look at every
+  // content surface, but every control that writes is withheld rather than
+  // left on screen to fail against the API.
+  const canWriteContent = hasPermission(admin.role, "content:write");
   if (section.startsWith("page-")) {
     const slug = section.slice(5);
     const pages = (await cmsService.list("page")).filter(
@@ -77,14 +82,29 @@ export default async function SectionPage({
         }}
       >
         <div className="rounded-xl bg-ad-sunken p-4 text-xs leading-6 text-ad-muted ring-1 ring-ad-line">
-          Select a section from the left, update its fields, and press{" "}
-          <strong>Save section</strong>. You do not need to edit code.
+          {canWriteContent ? (
+            <>
+              Select a section from the left, update its fields, and press{" "}
+              <strong>Save section</strong>. You do not need to edit code.
+            </>
+          ) : (
+            <>
+              Your account has <strong>read-only</strong> access. Every section
+              is shown as it is published; nothing here can be changed.
+            </>
+          )}
         </div>
-        <PageBuilder pages={pages} initialSections={pageSections} />
+        <PageBuilder
+          pages={pages}
+          initialSections={pageSections}
+          readOnly={!canWriteContent}
+        />
       </PageFrame>
     );
   }
   if (section === "navigation") {
+    // The sidebar hides this entry for a reader, but a typed URL must not.
+    if (!hasPermission(admin.role, "content:write")) notFound();
     const chromePages = (await cmsService.list("page")).filter(
       (page) => page.slug === "site-chrome",
     );
@@ -122,17 +142,26 @@ export default async function SectionPage({
       ).flat();
       return (
         <PageFrame info={info}>
-          <PageBuilder pages={rows} initialSections={pageSectionRows} />
+          <PageBuilder
+            pages={rows}
+            initialSections={pageSectionRows}
+            readOnly={!canWriteContent}
+          />
         </PageFrame>
       );
     }
     return (
       <PageFrame info={info}>
-        <ContentManager type={info.type} initialRows={rows} />
+        <ContentManager
+          type={info.type}
+          initialRows={rows}
+          readOnly={!canWriteContent}
+        />
       </PageFrame>
     );
   }
   if (section === "smtp") {
+    if (!hasPermission(admin.role, "settings:manage")) notFound();
     const initial = await getSettingGroup("smtp");
     return (
       <PageFrame
@@ -148,6 +177,7 @@ export default async function SectionPage({
     );
   }
   if (section === "settings") {
+    if (!hasPermission(admin.role, "settings:manage")) notFound();
     const [initial, media] = await Promise.all([
       getSettingGroup("general"),
       cmsService.listMedia(),
@@ -175,7 +205,6 @@ export default async function SectionPage({
     );
   }
   if (section === "users") {
-    const admin = await requireAdmin();
     // The sidebar hides this entry for a reader, but a typed URL must not.
     if (!hasPermission(admin.role, "users:manage")) notFound();
     const accounts = await userService.getAll();
@@ -199,7 +228,6 @@ export default async function SectionPage({
     );
   }
   if (section === "audit") {
-    const admin = await requireAdmin();
     if (!hasPermission(admin.role, "users:manage")) notFound();
     return (
       <PageFrame
@@ -215,7 +243,6 @@ export default async function SectionPage({
     );
   }
   if (section === "sessions") {
-    const admin = await requireAdmin();
     if (!hasPermission(admin.role, "users:manage")) notFound();
     return (
       <PageFrame
@@ -231,7 +258,6 @@ export default async function SectionPage({
     );
   }
   if (section === "security-events") {
-    const admin = await requireAdmin();
     if (!hasPermission(admin.role, "users:manage")) notFound();
     return (
       <PageFrame
@@ -248,7 +274,6 @@ export default async function SectionPage({
   }
   if (section === "security") return <SecurityPage />;
   if (section === "profile") {
-    const admin = await requireAdmin();
     return (
       <PageFrame
         info={{
@@ -270,6 +295,7 @@ export default async function SectionPage({
     );
   }
   if (section === "enquiries") {
+    if (!hasPermission(admin.role, "enquiries:manage")) notFound();
     const rows = await cmsService.listEnquiries();
     return (
       <PageFrame
@@ -285,10 +311,7 @@ export default async function SectionPage({
     );
   }
   if (section === "media") {
-    const [rows, admin] = await Promise.all([
-      cmsService.listMedia(),
-      requireAdmin(),
-    ]);
+    const rows = await cmsService.listMedia();
     // A Content Reader may look at the library but not add to it.
     const readOnly = !hasPermission(admin.role, "media:write");
     return (

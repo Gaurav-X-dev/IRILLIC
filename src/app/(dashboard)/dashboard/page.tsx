@@ -6,6 +6,7 @@ import {
   Boxes,
   CheckCircle2,
   DatabaseZap,
+  Eye,
   FileEdit,
   FileText,
   Image as ImageIcon,
@@ -22,6 +23,7 @@ import { Card, CardHeader, buttonClass } from "@/components/admin/ui";
 import { cmsService } from "@/services/cms.service";
 import { requireAdmin } from "@/lib/auth";
 import { getBranding } from "@/lib/branding";
+import { hasPermission, type AdminPermission } from "@/lib/rbac";
 
 /** Greeting based on the Indian business day the panel is operated in. */
 function greeting(): string {
@@ -37,42 +39,58 @@ function greeting(): string {
   return "Good evening";
 }
 
-const QUICK_ACTIONS = [
+/**
+ * Each shortcut carries the permission its screen needs, so a Content Reader
+ * is not offered a tile that answers with "not found" when it is opened.
+ */
+const QUICK_ACTIONS: {
+  icon: LucideIcon;
+  label: string;
+  hint: string;
+  href: string;
+  permission: AdminPermission;
+}[] = [
   {
     icon: FileEdit,
     label: "Edit a page",
     hint: "Section by section",
     href: "/dashboard/pages",
+    permission: "content:read",
   },
   {
     icon: Boxes,
     label: "Add a product",
     hint: "Imaging systems",
     href: "/dashboard/products",
+    permission: "content:write",
   },
   {
     icon: ImageIcon,
     label: "Upload media",
     hint: "Images and documents",
     href: "/dashboard/media",
+    permission: "media:write",
   },
   {
     icon: PanelTop,
     label: "Edit navigation",
     hint: "Navbar and mega menu",
     href: "/dashboard/navigation",
+    permission: "content:write",
   },
   {
     icon: MessageSquareText,
     label: "Review enquiries",
     hint: "Customer requests",
     href: "/dashboard/enquiries",
+    permission: "enquiries:manage",
   },
   {
     icon: Mail,
     label: "Email delivery",
     hint: "SMTP and alerts",
     href: "/dashboard/smtp",
+    permission: "settings:manage",
   },
 ];
 
@@ -86,11 +104,25 @@ export default async function DashboardPage() {
     getBranding(),
   ]);
   const firstName = admin.name.split(" ")[0];
+  const canWriteContent = hasPermission(admin.role, "content:write");
+  const canSeeEnquiries = hasPermission(admin.role, "enquiries:manage");
+  const quickActions = QUICK_ACTIONS.filter((action) =>
+    hasPermission(admin.role, action.permission),
+  );
   const managedContent =
     data.counts.products + data.counts.applications + data.counts.resources;
   const inventoryTotal = data.counts.pages + managedContent + data.counts.media;
 
-  const metrics = [
+  const metrics: {
+    label: string;
+    value: number;
+    icon: LucideIcon;
+    caption: string;
+    href: string;
+    tone: string;
+    trend?: { current: number; previous: number; noun: string };
+    progress?: number;
+  }[] = [
     {
       label: "Published pages",
       value: data.counts.pages,
@@ -124,7 +156,9 @@ export default async function DashboardPage() {
         ? Math.round((data.counts.resources / inventoryTotal) * 100)
         : 0,
     },
-    {
+  ];
+  if (canSeeEnquiries)
+    metrics.push({
       label: "New enquiries",
       value: data.counts.enquiries,
       icon: MessageSquareText,
@@ -132,8 +166,7 @@ export default async function DashboardPage() {
       href: "/dashboard/enquiries",
       trend: { ...data.trends.enquiries, noun: "enquiries" },
       tone: "amber",
-    },
-  ];
+    });
 
   const activityByDay = new Map(
     data.activity.map((item) => [item.day, Number(item.value)]),
@@ -206,12 +239,18 @@ export default async function DashboardPage() {
           <div className="w-full 2xl:justify-self-center">
             <DashboardClock />
           </div>
-          <Link
-            href="/dashboard/pages"
-            className="inline-flex h-12 w-full items-center justify-center gap-2 self-center rounded-xl bg-white px-6 text-xs font-bold text-blue-700 shadow-lg shadow-blue-950/20 transition hover:-translate-y-0.5 hover:bg-blue-50 sm:w-max 2xl:justify-self-end"
-          >
-            <Plus size={15} aria-hidden="true" /> Create content
-          </Link>
+          {canWriteContent ? (
+            <Link
+              href="/dashboard/pages"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 self-center rounded-xl bg-white px-6 text-xs font-bold text-blue-700 shadow-lg shadow-blue-950/20 transition hover:-translate-y-0.5 hover:bg-blue-50 sm:w-max 2xl:justify-self-end"
+            >
+              <Plus size={15} aria-hidden="true" /> Create content
+            </Link>
+          ) : (
+            <span className="inline-flex h-12 w-full items-center justify-center gap-2 self-center rounded-xl border border-white/20 bg-white/10 px-6 text-xs font-bold text-white backdrop-blur-sm sm:w-max 2xl:justify-self-end">
+              <Eye size={15} aria-hidden="true" /> Read-only access
+            </span>
+          )}
         </div>
         <div className="relative mt-7 grid border-t border-white/15 pt-5 sm:grid-cols-2 lg:grid-cols-4">
           <HeroSignal
@@ -254,7 +293,9 @@ export default async function DashboardPage() {
         }))}
       />
 
-      <section className="grid gap-5 xl:grid-cols-[1.15fr_.85fr]">
+      <section
+        className={`grid gap-5 ${canSeeEnquiries ? "xl:grid-cols-[1.15fr_.85fr]" : ""}`}
+      >
         <Card className="dashboard-action-panel">
           <CardHeader
             eyebrow="Actions"
@@ -262,7 +303,7 @@ export default async function DashboardPage() {
             description="The tasks opened most often from here."
           />
           <div className="grid gap-2.5 p-3 sm:grid-cols-2 lg:grid-cols-3">
-            {QUICK_ACTIONS.map(({ icon: Icon, label, hint, href }) => (
+            {quickActions.map(({ icon: Icon, label, hint, href }) => (
               <Link
                 key={label}
                 href={href}
@@ -287,67 +328,72 @@ export default async function DashboardPage() {
           </div>
         </Card>
 
-        <Card className="dashboard-inbox-panel">
-          <CardHeader
-            eyebrow="Engagement"
-            title="Latest enquiries"
-            action={
-              <Link href="/dashboard/enquiries" className={buttonClass.subtle}>
-                Open inbox
-              </Link>
-            }
-          />
-          {topbar.recentEnquiries.length ? (
-            <ul className="stagger divide-y divide-ad-hairline p-2">
-              {topbar.recentEnquiries.map((enquiry) => (
-                <li key={enquiry.id} className="overflow-hidden rounded-xl">
-                  <Link
-                    href="/dashboard/enquiries"
-                    className="group flex items-center gap-3 px-3 py-3 transition-colors hover:bg-ad-sunken"
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-500/10 text-violet-500">
-                      <MessageSquareText size={15} />
-                    </span>
-                    <span className="min-w-0">
-                      <strong className="block truncate text-xs font-semibold text-ad-ink">
-                        {enquiry.name}
-                      </strong>
-                      <span className="mt-0.5 block truncate text-[11px] text-ad-faint">
-                        {enquiry.subject}
+        {canSeeEnquiries ? (
+          <Card className="dashboard-inbox-panel">
+            <CardHeader
+              eyebrow="Engagement"
+              title="Latest enquiries"
+              action={
+                <Link
+                  href="/dashboard/enquiries"
+                  className={buttonClass.subtle}
+                >
+                  Open inbox
+                </Link>
+              }
+            />
+            {topbar.recentEnquiries.length ? (
+              <ul className="stagger divide-y divide-ad-hairline p-2">
+                {topbar.recentEnquiries.map((enquiry) => (
+                  <li key={enquiry.id} className="overflow-hidden rounded-xl">
+                    <Link
+                      href="/dashboard/enquiries"
+                      className="group flex items-center gap-3 px-3 py-3 transition-colors hover:bg-ad-sunken"
+                    >
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-500/10 text-violet-500">
+                        <MessageSquareText size={15} />
                       </span>
-                    </span>
-                    <time className="tabular ml-auto shrink-0 text-[10px] text-ad-faint">
-                      {enquiry.createdAt.toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                      })}
-                    </time>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="relative grid min-h-[248px] place-items-center overflow-hidden px-6 py-10 text-center">
-              <span className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-violet-500/10 blur-2xl" />
-              <span className="absolute -bottom-20 -left-16 h-44 w-44 rounded-full bg-cyan-500/10 blur-2xl" />
-              <div className="relative">
-                <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-500/15 to-violet-500/15 text-ad-accent ring-1 ring-ad-line">
-                  <MessageSquareText size={22} />
-                </span>
-                <p className="mt-4 text-sm font-semibold text-ad-ink">
-                  Inbox is clear
-                </p>
-                <p className="mx-auto mt-1 max-w-xs text-xs leading-5 text-ad-faint">
-                  New website enquiries will appear here automatically.
-                </p>
-                <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-600">
-                  <span className="dashboard-live-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Listening for submissions
-                </span>
+                      <span className="min-w-0">
+                        <strong className="block truncate text-xs font-semibold text-ad-ink">
+                          {enquiry.name}
+                        </strong>
+                        <span className="mt-0.5 block truncate text-[11px] text-ad-faint">
+                          {enquiry.subject}
+                        </span>
+                      </span>
+                      <time className="tabular ml-auto shrink-0 text-[10px] text-ad-faint">
+                        {enquiry.createdAt.toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
+                      </time>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="relative grid min-h-[248px] place-items-center overflow-hidden px-6 py-10 text-center">
+                <span className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-violet-500/10 blur-2xl" />
+                <span className="absolute -bottom-20 -left-16 h-44 w-44 rounded-full bg-cyan-500/10 blur-2xl" />
+                <div className="relative">
+                  <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-500/15 to-violet-500/15 text-ad-accent ring-1 ring-ad-line">
+                    <MessageSquareText size={22} />
+                  </span>
+                  <p className="mt-4 text-sm font-semibold text-ad-ink">
+                    Inbox is clear
+                  </p>
+                  <p className="mx-auto mt-1 max-w-xs text-xs leading-5 text-ad-faint">
+                    New website enquiries will appear here automatically.
+                  </p>
+                  <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1.5 text-[10px] font-bold text-emerald-600">
+                    <span className="dashboard-live-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    Listening for submissions
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
-        </Card>
+            )}
+          </Card>
+        ) : null}
       </section>
 
       <Card>

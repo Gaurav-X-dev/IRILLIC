@@ -217,6 +217,9 @@ export function AdminShell({
     "none",
   );
   const [collapsed, setCollapsed] = useState(false);
+  // Enquiries are an administrator screen, so the bell that reads them is not
+  // offered to a Content Reader either.
+  const canSeeEnquiries = admin.role === "admin";
 
   const visibleSections = useMemo(
     () =>
@@ -466,77 +469,79 @@ export function AdminShell({
               <ArrowUpRight size={13} aria-hidden="true" />
             </Link>
 
-            <div className="relative">
-              <button
-                type="button"
-                className="tap-target relative rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken"
-                onClick={() =>
-                  setMenu((open) =>
-                    open === "notifications" ? "none" : "notifications",
-                  )
-                }
-                aria-label={`${topbar.enquiryCount} new enquiries`}
-                aria-expanded={menu === "notifications"}
-              >
-                <Bell size={17} />
-                {topbar.enquiryCount > 0 ? (
-                  <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-ad-surface" />
-                ) : null}
-              </button>
-              {menu === "notifications" ? (
-                <Dropdown label="New enquiries">
-                  <div className="flex items-center justify-between border-b border-ad-hairline px-4 py-3">
-                    <div>
-                      <p className="text-sm font-semibold text-ad-ink">
-                        New enquiries
-                      </p>
-                      <p className="text-[10px] text-ad-faint">
-                        Live data from the website
-                      </p>
+            {canSeeEnquiries ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  className="tap-target relative rounded-xl p-2 text-ad-muted transition-colors hover:bg-ad-sunken"
+                  onClick={() =>
+                    setMenu((open) =>
+                      open === "notifications" ? "none" : "notifications",
+                    )
+                  }
+                  aria-label={`${topbar.enquiryCount} new enquiries`}
+                  aria-expanded={menu === "notifications"}
+                >
+                  <Bell size={17} />
+                  {topbar.enquiryCount > 0 ? (
+                    <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-ad-surface" />
+                  ) : null}
+                </button>
+                {menu === "notifications" ? (
+                  <Dropdown label="New enquiries">
+                    <div className="flex items-center justify-between border-b border-ad-hairline px-4 py-3">
+                      <div>
+                        <p className="text-sm font-semibold text-ad-ink">
+                          New enquiries
+                        </p>
+                        <p className="text-[10px] text-ad-faint">
+                          Live data from the website
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-rose-500/10 px-2 py-1 text-[10px] font-bold text-rose-500">
+                        {topbar.enquiryCount} new
+                      </span>
                     </div>
-                    <span className="rounded-full bg-rose-500/10 px-2 py-1 text-[10px] font-bold text-rose-500">
-                      {topbar.enquiryCount} new
-                    </span>
-                  </div>
-                  <div className="max-h-72 overflow-y-auto">
-                    {topbar.recentEnquiries.length ? (
-                      topbar.recentEnquiries.map((item) => (
-                        <Link
-                          key={item.id}
-                          href="/dashboard/enquiries"
-                          className="block border-b border-ad-hairline px-4 py-3 transition-colors last:border-0 hover:bg-ad-sunken"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <strong className="truncate text-xs font-semibold text-ad-ink">
-                              {item.name}
-                            </strong>
-                            <time className="tabular shrink-0 text-[10px] text-ad-faint">
-                              {new Date(item.createdAt).toLocaleDateString(
-                                "en-IN",
-                                { day: "2-digit", month: "short" },
-                              )}
-                            </time>
-                          </div>
-                          <p className="mt-1 truncate text-[11px] text-ad-muted">
-                            {item.subject}
-                          </p>
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="px-4 py-10 text-center text-xs text-ad-faint">
-                        No new enquiries
-                      </p>
-                    )}
-                  </div>
-                  <Link
-                    href="/dashboard/enquiries"
-                    className="block bg-ad-sunken px-4 py-3 text-center text-xs font-semibold text-ad-accent"
-                  >
-                    View all enquiries
-                  </Link>
-                </Dropdown>
-              ) : null}
-            </div>
+                    <div className="max-h-72 overflow-y-auto">
+                      {topbar.recentEnquiries.length ? (
+                        topbar.recentEnquiries.map((item) => (
+                          <Link
+                            key={item.id}
+                            href="/dashboard/enquiries"
+                            className="block border-b border-ad-hairline px-4 py-3 transition-colors last:border-0 hover:bg-ad-sunken"
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <strong className="truncate text-xs font-semibold text-ad-ink">
+                                {item.name}
+                              </strong>
+                              <time className="tabular shrink-0 text-[10px] text-ad-faint">
+                                {new Date(item.createdAt).toLocaleDateString(
+                                  "en-IN",
+                                  { day: "2-digit", month: "short" },
+                                )}
+                              </time>
+                            </div>
+                            <p className="mt-1 truncate text-[11px] text-ad-muted">
+                              {item.subject}
+                            </p>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="px-4 py-10 text-center text-xs text-ad-faint">
+                          No new enquiries
+                        </p>
+                      )}
+                    </div>
+                    <Link
+                      href="/dashboard/enquiries"
+                      className="block bg-ad-sunken px-4 py-3 text-center text-xs font-semibold text-ad-accent"
+                    >
+                      View all enquiries
+                    </Link>
+                  </Dropdown>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="relative">
               <button
