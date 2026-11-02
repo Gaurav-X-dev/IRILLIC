@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SiteChrome } from "@/components/layout/site-chrome";
+import { CopyGuard } from "@/components/shared/copy-guard";
 import { cmsService } from "@/services/cms.service";
 import { applyGlobalContact, getBranding } from "@/lib/branding";
 import { siteChromeContentSchema } from "@/validations/public-content.validation";
@@ -48,6 +49,7 @@ export default async function SiteLayout({
         />
       }
     >
+      <CopyGuard />
       {children}
     </SiteChrome>
   );

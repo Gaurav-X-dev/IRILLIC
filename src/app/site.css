@@ -4209,3 +4209,38 @@ dialog.modal[open] {
     max-width: 560px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Content protection
+
+   The class is added by <CopyGuard />, so these rules only apply once the
+   script that pairs with them is running. Form fields keep normal selection:
+   a visitor has to be able to correct what they typed into an enquiry.
+   --------------------------------------------------------------------------- */
+.is-copy-guarded body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.is-copy-guarded input,
+.is-copy-guarded textarea,
+.is-copy-guarded select,
+.is-copy-guarded [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+.is-copy-guarded img,
+.is-copy-guarded svg,
+.is-copy-guarded video {
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+/* Links and buttons wrapping an image must still be clickable. */
+.is-copy-guarded a img,
+.is-copy-guarded button img,
+.is-copy-guarded a svg,
+.is-copy-guarded button svg {
+  pointer-events: auto;
+}
