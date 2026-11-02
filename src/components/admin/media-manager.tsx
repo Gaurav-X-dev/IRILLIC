@@ -13,6 +13,11 @@ import {
 import { useToast } from "@/components/admin/toast";
 import { checkForm } from "@/components/admin/form-validation";
 import { Req, RequiredNote } from "@/components/admin/ui";
+import {
+  DEFAULT_MAX_UPLOAD_MB,
+  MAX_UPLOAD_MB,
+  uploadLimitMb,
+} from "@/lib/upload-limits";
 
 function assetKind(mimeType: string) {
   if (mimeType.startsWith("image/")) return "image";
@@ -79,6 +84,20 @@ export function MediaManager({
     if (readOnly) return;
     const problem = checkForm(event.currentTarget);
     if (problem) return setError(problem);
+    // Catch an over-sized file before spending minutes uploading it only for
+    // the server to refuse it at the far end.
+    const picked = Array.from(
+      event.currentTarget.querySelector<HTMLInputElement>('input[name="file"]')
+        ?.files ?? [],
+    );
+    const tooLarge = picked.find(
+      (file) => file.size > uploadLimitMb(file.type) * 1024 * 1024,
+    );
+    if (tooLarge)
+      return setError(
+        `${tooLarge.name} is ${(tooLarge.size / (1024 * 1024)).toFixed(1)} MB. ` +
+          `${tooLarge.type.startsWith("video/") ? "Videos" : "Files"} must be ${uploadLimitMb(tooLarge.type)} MB or smaller.`,
+      );
     setBusy(true);
     setError("");
     const response = await fetch("/api/admin/media", {
@@ -240,6 +259,11 @@ export function MediaManager({
                 {chosen > 1
                   ? `${chosen} files selected — each keeps its own file name.`
                   : "Choose one file, or several to upload them together."}
+              </p>
+              <p className="text-[11px] leading-5 text-ad-faint">
+                Images and documents up to {DEFAULT_MAX_UPLOAD_MB} MB; MP4 video
+                up to {MAX_UPLOAD_MB["video/mp4"]} MB. Images are converted to
+                WebP automatically.
               </p>
               {/* A display name and alt text describe one file, so they are
                   offered only when one file is being uploaded. */}

@@ -10,6 +10,7 @@ import { authorizeAdminApi } from "@/lib/admin-api";
 import { apiError, clientIp } from "@/lib/api";
 import { hasExpectedFileSignature } from "@/lib/file-signature";
 import { paginationFromUrl, paginationMeta } from "@/lib/pagination";
+import { uploadLimitMb } from "@/lib/upload-limits";
 
 export const runtime = "nodejs";
 const allowed = new Map([
@@ -74,8 +75,11 @@ async function storeFile(
   });
   let extension = allowed.get(file.type);
   if (!extension) return fail("Unsupported file type");
-  if (file.size > 10 * 1024 * 1024)
-    return fail("File must be 10 MB or smaller");
+  const limitMb = uploadLimitMb(file.type);
+  if (file.size > limitMb * 1024 * 1024)
+    return fail(
+      `${file.type.startsWith("video/") ? "Video" : "File"} must be ${limitMb} MB or smaller`,
+    );
   const source = Buffer.from(await file.arrayBuffer());
   const isImage = file.type.startsWith("image/");
   if (!isImage && !hasExpectedFileSignature(file.type, source))
