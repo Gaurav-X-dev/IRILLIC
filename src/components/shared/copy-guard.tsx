@@ -22,6 +22,12 @@ import { useEffect } from "react";
  * reference. Taking that away withheld navigation, not content -- and a link's
  * text is already in the page for anyone who wants it.
  *
+ * The developer tools and view-source are left alone. Withholding F12 and
+ * Ctrl+U stopped nobody -- the tools open from the browser's own menu, which
+ * no page can reach -- while it did stop the people maintaining this site from
+ * checking their own work. What is withheld here is taking the content: the
+ * selection, the copy, the drag, the right-click save.
+ *
  * This is a deterrent, not a secret: anything a browser renders can still be
  * read from the page source, so nothing confidential should be published here.
  */
@@ -50,16 +56,10 @@ export function CopyGuard() {
     const onKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       if (inEditable(event.target)) return;
-      // Copy, cut, select-all, save, print and view-source.
+      // Copy, cut, select-all, save and print.
       if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
-        if (["c", "x", "a", "s", "p", "u"].includes(key))
-          event.preventDefault();
+        if (["c", "x", "a", "s", "p"].includes(key)) event.preventDefault();
       }
-      // The developer-tools shortcuts, which exist to read the page wholesale.
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
-        if (["i", "j", "c"].includes(key)) event.preventDefault();
-      }
-      if (key === "f12") event.preventDefault();
     };
 
     // On a link or a button these two are the navigation menu and the
