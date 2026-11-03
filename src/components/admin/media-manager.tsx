@@ -56,6 +56,7 @@ export function MediaManager({
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [busyId, setBusyId] = useState("");
+  const [newFolder, setNewFolder] = useState(false);
   const confirm = useConfirm();
   const toast = useToast();
   useEffect(() => {
@@ -63,8 +64,12 @@ export function MediaManager({
   }, [error, toast]);
   const router = useRouter();
   const folders = Array.from(
-    new Set(assets.map((asset) => asset.folder)),
-  ).sort();
+    new Set(assets.map((asset) => asset.folder).filter(Boolean)),
+  ).sort((a, b) => a.localeCompare(b));
+  // The folder was a free text box, so "Video", "video" and "videos" each
+  // made a folder of their own and the library quietly fragmented. The
+  // folders that already exist are offered instead, with one way to add.
+  const [folder, setFolder] = useState(folders[0] ?? "general");
   const table = useTableControls<Asset>({
     rows: assets,
     searchFields: (asset) => [asset.name, asset.folder, asset.mimeType],
@@ -357,12 +362,70 @@ export function MediaManager({
                   />
                 </>
               )}
-              <input
-                name="folder"
-                placeholder="Folder"
-                defaultValue="general"
-                className="h-11 w-full rounded-lg ring-1 ring-ad-line px-3 text-sm"
-              />
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-semibold text-ad-muted">
+                  Folder <Req />
+                </span>
+                {newFolder ? (
+                  <div className="flex gap-2">
+                    <input
+                      name="folder"
+                      aria-label="Folder"
+                      required
+                      autoFocus
+                      value={folder}
+                      onChange={(event) =>
+                        // Folders become part of the file's path on disk, so
+                        // a name is reduced to what a path can safely hold.
+                        setFolder(
+                          event.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z0-9-]+/g, "-")
+                            .replace(/^-+/, "")
+                            .slice(0, 40),
+                        )
+                      }
+                      placeholder="new-folder-name"
+                      className="h-11 w-full rounded-lg px-3 text-sm ring-1 ring-ad-line"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewFolder(false);
+                        setFolder(folders[0] ?? "general");
+                      }}
+                      className="h-11 shrink-0 rounded-lg px-3 text-xs font-semibold text-ad-muted ring-1 ring-ad-line"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <select
+                    name="folder"
+                    aria-label="Folder"
+                    required
+                    value={folder}
+                    onChange={(event) => {
+                      if (event.target.value === "__new") {
+                        setNewFolder(true);
+                        return setFolder("");
+                      }
+                      setFolder(event.target.value);
+                    }}
+                    className="h-11 w-full rounded-lg px-3 text-sm ring-1 ring-ad-line"
+                  >
+                    {folders.length ? null : (
+                      <option value="general">general</option>
+                    )}
+                    {folders.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                    <option value="__new">+ New folder…</option>
+                  </select>
+                )}
+              </label>
             </div>
             <button
               disabled={busy}
