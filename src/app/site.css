@@ -4241,3 +4241,9 @@ dialog.modal[open] {
   -webkit-user-drag: none;
   user-select: none;
 }
+/* A long press on a link is how a phone offers "Open in new tab"; the callout
+   is suppressed on the page's own text and images, not on its navigation. */
+.site a[href],
+.site button {
+  -webkit-touch-callout: default;
+}

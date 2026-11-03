@@ -16,16 +16,28 @@ import { useEffect } from "react";
  * lock that does not work on the first paint, or at all if the bundle is slow.
  * This component adds the part CSS cannot do — the events and shortcuts.
  *
+ * Links and buttons are left alone as well. The right-click menu is not only
+ * "Save image as": on a link it is also "Open in new tab" and "Open in new
+ * window", which is how a visitor keeps the page they are on while following a
+ * reference. Taking that away withheld navigation, not content -- and a link's
+ * text is already in the page for anyone who wants it.
+ *
  * This is a deterrent, not a secret: anything a browser renders can still be
  * read from the page source, so nothing confidential should be published here.
  */
 
 const EDITABLE = "input, textarea, select, [contenteditable='true']";
+/** What a visitor uses to get somewhere, rather than to take something. */
+const NAVIGABLE = "a[href], button, [role='link'], [role='button'], summary";
+
+function matches(target: EventTarget | null, selector: string): boolean {
+  return (
+    target instanceof Element && Boolean(target.closest<Element>(selector))
+  );
+}
 
 function inEditable(target: EventTarget | null): boolean {
-  return (
-    target instanceof Element && Boolean(target.closest<Element>(EDITABLE))
-  );
+  return matches(target, EDITABLE);
 }
 
 export function CopyGuard() {
@@ -50,18 +62,24 @@ export function CopyGuard() {
       if (key === "f12") event.preventDefault();
     };
 
-    const events: (keyof DocumentEventMap)[] = [
-      "contextmenu",
-      "copy",
-      "cut",
-      "dragstart",
-      "selectstart",
-    ];
+    // On a link or a button these two are the navigation menu and the
+    // drag-a-link gesture, so they stay; everywhere else they are the way
+    // images and text leave the page.
+    const navigation = (event: Event) => {
+      if (matches(event.target, NAVIGABLE)) return;
+      block(event);
+    };
+
+    const events: (keyof DocumentEventMap)[] = ["copy", "cut", "selectstart"];
     events.forEach((name) => document.addEventListener(name, block));
+    document.addEventListener("contextmenu", navigation);
+    document.addEventListener("dragstart", navigation);
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
       events.forEach((name) => document.removeEventListener(name, block));
+      document.removeEventListener("contextmenu", navigation);
+      document.removeEventListener("dragstart", navigation);
       document.removeEventListener("keydown", onKeyDown);
     };
   }, []);
