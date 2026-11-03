@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   Check,
   Copy,
+  ExternalLink,
   FileImage,
   FileText,
   Trash2,
@@ -99,7 +100,19 @@ export function MediaManager({
     const kind = assetKind(asset.mimeType);
     if (kind === "image")
       return (
-        <img src={asset.url} alt="" className="h-full w-full object-cover" />
+        <a
+          href={asset.url}
+          target="_blank"
+          rel="noopener"
+          aria-label={`Open ${asset.name} in a new tab`}
+          className="block h-full w-full"
+        >
+          <img
+            src={asset.url}
+            alt=""
+            className="h-full w-full object-cover transition-transform duration-200 hover:scale-[1.03]"
+          />
+        </a>
       );
     if (kind === "video")
       return (
@@ -114,14 +127,31 @@ export function MediaManager({
       );
     if (kind === "document")
       return (
-        <span className="grid place-items-center gap-2 text-ad-faint">
+        <a
+          href={asset.url}
+          target="_blank"
+          rel="noopener"
+          className="grid h-full w-full place-items-center gap-2 text-ad-faint transition-colors hover:bg-ad-accent-soft hover:text-ad-accent"
+        >
           <FileText size={32} aria-hidden="true" />
           <span className="text-[10px] font-bold uppercase tracking-[.14em]">
-            PDF
+            Open PDF
           </span>
-        </span>
+        </a>
       );
-    return <FileImage size={32} className="text-ad-faint" aria-hidden="true" />;
+    return (
+      <a
+        href={asset.url}
+        target="_blank"
+        rel="noopener"
+        className="grid h-full w-full place-items-center gap-2 text-ad-faint transition-colors hover:bg-ad-accent-soft hover:text-ad-accent"
+      >
+        <FileImage size={32} aria-hidden="true" />
+        <span className="text-[10px] font-bold uppercase tracking-[.14em]">
+          Open file
+        </span>
+      </a>
+    );
   }
 
   async function remove(asset: Asset) {
@@ -263,6 +293,15 @@ export function MediaManager({
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
+                    <a
+                      href={asset.url}
+                      target="_blank"
+                      rel="noopener"
+                      aria-label={`Open ${asset.name} in a new tab`}
+                      className="rounded-lg p-2 text-ad-faint ring-1 ring-ad-line transition hover:text-ad-accent hover:ring-ad-accent/60"
+                    >
+                      <ExternalLink size={14} />
+                    </a>
                     <button
                       type="button"
                       onClick={() => copyUrl(asset)}
