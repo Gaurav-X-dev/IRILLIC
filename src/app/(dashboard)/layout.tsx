@@ -9,6 +9,7 @@ import { ShieldAlert } from "lucide-react";
 import { PasswordForm } from "@/components/admin/password-form";
 import { ConfirmProvider } from "@/components/admin/confirm";
 import { ToastProvider } from "@/components/admin/toast";
+import { SessionGuard } from "@/components/admin/session-guard";
 import { requireAdmin } from "@/lib/auth";
 import { cmsService } from "@/services/cms.service";
 import { getBranding } from "@/lib/branding";
@@ -88,6 +89,7 @@ export default async function DashboardLayout({
       {/* Inside the shell, so the panel's theme variables reach the toasts;
           mounted outside them, the colours resolve to nothing. */}
       <ToastProvider>
+        <SessionGuard />
         <ConfirmProvider>{children}</ConfirmProvider>
       </ToastProvider>
     </AdminShell>

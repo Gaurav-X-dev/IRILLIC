@@ -10,7 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Req } from "@/components/admin/ui";
 
 export default function LoginPage() {
@@ -21,6 +21,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  // requireAdmin() and the session guard both send an editor here with a
+  // reason. Without it the panel simply vanished mid-task and reappeared as
+  // a sign-in screen, which reads as the panel having lost their work.
+  const reason = useSearchParams().get("reason");
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,6 +58,16 @@ export default function LoginPage() {
       <p className="mt-2.5 text-sm leading-6 text-ad-muted">
         Sign in with your administrator credentials to continue.
       </p>
+
+      {reason === "session" && !error ? (
+        <p
+          role="status"
+          className="animate-rise mt-6 rounded-xl bg-amber-500/10 px-4 py-3 text-xs leading-5 font-medium text-amber-600 ring-1 ring-amber-500/25"
+        >
+          Your session has ended. Sign in again to continue — nothing you had
+          already saved is affected.
+        </p>
+      ) : null}
 
       <form className="mt-8 space-y-4" onSubmit={submit}>
         <label className="block">
