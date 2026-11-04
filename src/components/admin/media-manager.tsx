@@ -24,6 +24,8 @@ import { useConfirm } from "@/components/admin/confirm";
 import { checkForm } from "@/components/admin/form-validation";
 import { Req, RequiredNote } from "@/components/admin/ui";
 import {
+  ACCEPTED_UPLOAD_LABEL,
+  ACCEPTED_UPLOAD_TYPES,
   DEFAULT_MAX_UPLOAD_MB,
   MAX_UPLOAD_MB,
   uploadLimitMb,
@@ -196,6 +198,15 @@ export function MediaManager({
       event.currentTarget.querySelector<HTMLInputElement>('input[name="file"]')
         ?.files ?? [],
     );
+    // The picker's "All files" option means anything can be chosen, so the
+    // type is checked here too rather than only after the upload.
+    const wrongType = picked.find(
+      (file) => !ACCEPTED_UPLOAD_TYPES.includes(file.type),
+    );
+    if (wrongType)
+      return setError(
+        `${wrongType.name} cannot be uploaded. Choose a ${ACCEPTED_UPLOAD_LABEL} file.`,
+      );
     const tooLarge = picked.find(
       (file) => file.size > uploadLimitMb(file.type) * 1024 * 1024,
     );
@@ -372,7 +383,7 @@ export function MediaManager({
                 onChange={(event) =>
                   setChosen(event.currentTarget.files?.length ?? 0)
                 }
-                accept="image/jpeg,image/png,image/webp,application/pdf,video/mp4"
+                accept={ACCEPTED_UPLOAD_TYPES.join(",")}
                 className="block w-full rounded-lg border border-dashed border-ad-line p-5 text-xs"
               />
               <p className="text-[11px] text-ad-faint">
@@ -381,9 +392,12 @@ export function MediaManager({
                   : "Choose one file, or several to upload them together."}
               </p>
               <p className="text-[11px] leading-5 text-ad-faint">
-                Images and documents up to {DEFAULT_MAX_UPLOAD_MB} MB; MP4 video
-                up to {MAX_UPLOAD_MB["video/mp4"]} MB. Images are converted to
-                WebP automatically.
+                {/* The accepted list is spelled out: "images and documents"
+                    reads as though a Word file would be taken, and the file
+                    picker's own "All files" option lets one be chosen. */}
+                JPG, PNG, WebP and PDF up to {DEFAULT_MAX_UPLOAD_MB} MB; MP4
+                video up to {MAX_UPLOAD_MB["video/mp4"]} MB. Images are
+                converted to WebP automatically.
               </p>
               {/* A display name and alt text describe one file, so they are
                   offered only when one file is being uploaded. */}

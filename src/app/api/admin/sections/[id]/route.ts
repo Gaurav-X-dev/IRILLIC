@@ -55,11 +55,27 @@ export async function PATCH(request: Request, routeContext: Context) {
     const candidate = current.sections.map((section) =>
       section.id === id ? { ...section, ...input } : section,
     );
-    validateKnownCmsContent(
-      "page",
-      current.page.slug,
-      assemblePageContent(candidate),
-    );
+    try {
+      validateKnownCmsContent(
+        "page",
+        current.page.slug,
+        assemblePageContent(candidate),
+      );
+    } catch (invalid) {
+      // A hidden section is left out of the page entirely, so hiding one the
+      // design depends on makes the whole page invalid. Reported as a schema
+      // error that said "Divisions: expected array", the toggle simply looked
+      // broken: the reason was never that the content was wrong.
+      if (input.isEnabled === false)
+        return NextResponse.json(
+          {
+            success: false,
+            error: `${current.section.label} is required by the current page design and cannot be hidden. Its fields can still be edited.`,
+          },
+          { status: 409 },
+        );
+      throw invalid;
+    }
     const [updated] = await db
       .update(pageSections)
       .set({ ...input, updatedAt: new Date() })

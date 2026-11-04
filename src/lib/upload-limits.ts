@@ -16,3 +16,15 @@ export const DEFAULT_MAX_UPLOAD_MB = 10;
 export function uploadLimitMb(mimeType: string): number {
   return MAX_UPLOAD_MB[mimeType] ?? DEFAULT_MAX_UPLOAD_MB;
 }
+
+/** The types the media library stores, shared by the dialog and the route. */
+export const ACCEPTED_UPLOAD_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+  "video/mp4",
+];
+
+/** How the accepted types are named to an editor. */
+export const ACCEPTED_UPLOAD_LABEL = "JPG, PNG, WebP, PDF or MP4";

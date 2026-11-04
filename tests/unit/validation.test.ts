@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { clientIp, databaseErrorCode } from "../../src/lib/api";
+import { z } from "zod";
+import { clientIp, databaseErrorCode, zodMessage } from "../../src/lib/api";
 import { isSafePublicUrl } from "../../src/lib/safe-url";
 import { hasExpectedFileSignature } from "../../src/lib/file-signature";
 import {
@@ -226,4 +227,30 @@ test("an upload limit is raised for video only", () => {
   assert.equal(uploadLimitMb("video/mp4"), 20);
   assert.equal(uploadLimitMb("image/png"), 10);
   assert.equal(uploadLimitMb("application/pdf"), 10);
+});
+
+test("a validation message names the field, the item and every problem", () => {
+  const schema = z.object({
+    divisions: z.array(z.object({ title: z.string(), href: z.string() })),
+  });
+  const missing = schema.safeParse({});
+  assert.equal(missing.success, false);
+  // The toggle that hid a required section reported "Divisions: expected
+  // array", which read as though the content were wrong rather than absent.
+  assert.equal(
+    zodMessage(missing.error!),
+    "Divisions: this is required and is currently empty.",
+  );
+
+  const wrong = schema.safeParse({
+    divisions: [
+      { title: "One", href: "/one" },
+      { title: 7, href: null },
+    ],
+  });
+  assert.equal(wrong.success, false);
+  const message = zodMessage(wrong.error!);
+  // The index is what tells an editor which of the repeated cards to open.
+  assert.match(message, /Divisions, item 2 › Title/);
+  assert.match(message, /Divisions, item 2 › Href/);
 });

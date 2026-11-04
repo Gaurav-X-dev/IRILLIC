@@ -10,7 +10,7 @@ import { authorizeAdminApi } from "@/lib/admin-api";
 import { apiError, clientIp } from "@/lib/api";
 import { hasExpectedFileSignature } from "@/lib/file-signature";
 import { paginationFromUrl, paginationMeta } from "@/lib/pagination";
-import { uploadLimitMb } from "@/lib/upload-limits";
+import { ACCEPTED_UPLOAD_LABEL, uploadLimitMb } from "@/lib/upload-limits";
 
 export const runtime = "nodejs";
 const allowed = new Map([
@@ -59,6 +59,13 @@ export async function GET(request: Request) {
     return apiError(error);
   }
 }
+/** What the refusal calls the file, from its own name or declared type. */
+function describeType(file: File) {
+  const extension = file.name.match(/\.([a-z0-9]+)$/i)?.[1];
+  if (extension) return extension.toUpperCase();
+  return file.type || "unrecognised";
+}
+
 /** One stored file, or the reason it could not be stored. */
 type Stored =
   | { ok: true; asset: typeof mediaAssets.$inferSelect }
@@ -74,7 +81,10 @@ async function storeFile(
     error,
   });
   let extension = allowed.get(file.type);
-  if (!extension) return fail("Unsupported file type");
+  if (!extension)
+    return fail(
+      `${file.name} is a ${describeType(file)} file. Upload a ${ACCEPTED_UPLOAD_LABEL}.`,
+    );
   const limitMb = uploadLimitMb(file.type);
   if (file.size > limitMb * 1024 * 1024)
     return fail(
@@ -164,7 +174,16 @@ export async function POST(request: Request) {
 
     if (!stored.length)
       return NextResponse.json(
-        { success: false, error: failed[0]?.error ?? "Upload failed", failed },
+        {
+          success: false,
+          // Several files can be refused for several reasons; one message that
+          // named only the first left the rest a mystery.
+          error:
+            failed.length > 1
+              ? failed.map((f) => f.error).join(" ")
+              : (failed[0]?.error ?? "Upload failed"),
+          failed,
+        },
         { status: 415 },
       );
     return NextResponse.json(

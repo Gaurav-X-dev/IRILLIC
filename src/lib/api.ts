@@ -3,33 +3,66 @@ import { ZodError, type ZodIssue } from "zod";
 import { isIP } from "net";
 import { SettingValidationError } from "@/validations/setting.validation";
 
-/** Turns "contact.phone" or "slides.0.title" into "Contact phone". */
-function fieldLabel(path: ZodIssue["path"]) {
-  const named = path.filter((part) => typeof part === "string") as string[];
-  if (!named.length) return "";
-  const last = named[named.length - 1];
-  const spaced = last.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
+function humanise(key: string) {
+  const spaced = key.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+/**
+ * Turns "slides.0.title" into "Slides, item 1 › Title".
+ *
+ * Only the last key used to be reported, which named a field an editor could
+ * not find: "Title" on a page with eleven of them. The index matters most --
+ * it is the one thing that says which of the repeated cards to open.
+ */
+function fieldLabel(path: ZodIssue["path"]) {
+  const parts: string[] = [];
+  for (const part of path) {
+    if (typeof part === "number") {
+      if (parts.length) parts[parts.length - 1] += `, item ${part + 1}`;
+    } else parts.push(humanise(String(part)));
+  }
+  return parts.join(" › ");
+}
+
+/** The reason for one issue, in a sentence an editor can act on. */
+function issueReason(issue: ZodIssue) {
+  if (issue.code === "invalid_type") {
+    // "Expected array, received undefined" means the value is not there at
+    // all, which for an editor is a missing entry rather than a wrong type.
+    if (issue.input === undefined || issue.input === null)
+      return "this is required and is currently empty";
+    return `expected ${issue.expected}, which this is not`;
+  }
+  if (issue.code === "invalid_value" || issue.code === "invalid_union")
+    return "this value is not one of the accepted options";
+  if (issue.message.startsWith("Invalid option"))
+    return "this value is not one of the accepted options";
+  return issue.message.charAt(0).toLowerCase() + issue.message.slice(1);
 }
 
 /**
  * Zod's own wording ("Invalid option: expected one of…") describes the schema,
  * not the mistake, and never says which field it is about. An administrator
  * needs the field name and a plain sentence to act on.
+ *
+ * Every problem is reported, not just the first. One at a time meant fixing a
+ * field, saving, and being told about the next one -- and when a form held
+ * several mistakes it was never clear how many were left.
  */
 export function zodMessage(error: ZodError) {
-  const issue = error.issues[0];
-  if (!issue) return "Invalid request";
-  const label = fieldLabel(issue.path);
-  let reason = issue.message;
-  if (issue.code === "invalid_type") reason = `expected ${issue.expected}`;
-  else if (issue.code === "invalid_value" || issue.code === "invalid_union")
-    reason = "this value is not one of the accepted options";
-  else if (reason.startsWith("Invalid option"))
-    reason = "this value is not one of the accepted options";
-  // Zod's own sentences already read well; keep them, just add the field.
-  const sentence = reason.charAt(0).toLowerCase() + reason.slice(1);
-  return label ? `${label}: ${sentence}` : reason;
+  const issues = error.issues.slice(0, 3);
+  if (!issues.length) return "Invalid request";
+  const sentences = issues.map((issue) => {
+    const label = fieldLabel(issue.path);
+    const reason = issueReason(issue);
+    return label ? `${label}: ${reason}` : reason;
+  });
+  const rest = error.issues.length - issues.length;
+  return (
+    sentences.join(". ") +
+    (rest > 0 ? `. And ${rest} more problem${rest === 1 ? "" : "s"}.` : ".")
+  );
 }
 
 export function apiError(
