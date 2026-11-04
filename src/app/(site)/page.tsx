@@ -261,10 +261,18 @@ export default async function HomePage() {
             </div>
             <ul className="specialty-links">
               {content.specialtyLinks.map((s) => (
-                <li key={s}>
-                  <SmartLink href="#clinical-impact">
-                    {s} <ArrowUpRight className="i" aria-hidden="true" />
-                  </SmartLink>
+                <li key={s.linkLabel}>
+                  {/* Until an editor gives this one an address it stays plain
+                      text: a link that goes nowhere looks like the page is
+                      broken, which is worse than no link at all. */}
+                  {s.href ? (
+                    <SmartLink href={s.href}>
+                      {s.linkLabel}{" "}
+                      <ArrowUpRight className="i" aria-hidden="true" />
+                    </SmartLink>
+                  ) : (
+                    <span>{s.linkLabel}</span>
+                  )}
                 </li>
               ))}
             </ul>

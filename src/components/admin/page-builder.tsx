@@ -229,8 +229,8 @@ export function PageBuilder({
         readOnly={readOnly}
         onSaved={() => router.refresh()}
       />
-      <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[300px_minmax(0,1fr)] xl:gap-5">
-        <div className="min-w-0 xl:sticky xl:top-[88px]">
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-5 xl:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="min-w-0 lg:sticky lg:top-[88px]">
           <aside className="ad-card overflow-hidden rounded-2xl bg-ad-surface shadow-ad-sm ring-1 ring-ad-line">
             <div className="flex items-start justify-between gap-3 border-b border-ad-hairline px-4 py-3.5">
               <div className="min-w-0">
@@ -251,7 +251,7 @@ export function PageBuilder({
               ) : null}
             </div>
 
-            <div className="border-b border-ad-hairline p-3 xl:hidden">
+            <div className="border-b border-ad-hairline p-3 lg:hidden">
               <label className="block">
                 <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[.14em] text-ad-faint">
                   Select a section to edit
@@ -281,7 +281,7 @@ export function PageBuilder({
               ) : null}
             </div>
 
-            <div className="hidden border-b border-ad-hairline p-2.5 xl:block">
+            <div className="hidden border-b border-ad-hairline p-2.5 lg:block">
               <div className="relative">
                 <Search
                   size={14}
@@ -299,7 +299,7 @@ export function PageBuilder({
               </div>
             </div>
 
-            <div className="hidden max-h-[calc(100vh-19rem)] overflow-y-auto p-2 xl:block">
+            <div className="hidden max-h-[max(16rem,calc(100vh-19rem))] overflow-y-auto p-2 lg:block">
               {groupedSections.map(({ group, items }) => (
                 <div key={group} className="mb-3 last:mb-0">
                   <p className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-ad-faint">

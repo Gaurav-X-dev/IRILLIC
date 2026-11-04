@@ -148,7 +148,17 @@ export const homeContentSchema = z.object({
       }),
     )
     .min(1),
-  specialtyLinks: z.array(z.string()),
+  specialtyLinks: z.array(
+    // Older rows stored only the text, with every link pointing at the
+    // section it sits in. Those are read as a link with no destination
+    // rather than rejected, so a page saved before this field existed still
+    // renders while an editor fills the addresses in.
+    z.preprocess(
+      (item) =>
+        typeof item === "string" ? { linkLabel: item, href: "" } : item,
+      z.object({ linkLabel: z.string(), href: z.string() }),
+    ),
+  ),
   documents: z.array(
     z.object({ cat: z.string(), title: z.string(), format: z.string() }),
   ),

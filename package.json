@@ -20,6 +20,7 @@
     "content:backfill": "tsx --env-file=.env.local scripts/backfill-dynamic-content.ts",
     "branding:backfill": "tsx --env-file=.env.local scripts/backfill-required-branding.ts",
     "sections:backfill": "tsx --env-file=.env.local scripts/backfill-page-sections.ts",
+    "links:backfill": "tsx --env-file=.env.local scripts/migrate-specialty-links.ts",
     "type-check": "tsc --noEmit",
     "test": "npm run test:unit",
     "test:unit": "tsx --test tests/unit/*.test.ts",

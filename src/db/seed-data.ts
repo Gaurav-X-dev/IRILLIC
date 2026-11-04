@@ -238,10 +238,19 @@ export const HOME_CONTENT = {
     },
   ],
   specialtyLinks: [
-    "Surgical Oncology",
-    "Plastic & Reconstructive",
-    "Gastrointestinal",
-    "Urology & Gynaecology",
+    {
+      linkLabel: "Surgical Oncology",
+      href: "/clinical-applications#oncology",
+    },
+    {
+      linkLabel: "Plastic & Reconstructive",
+      href: "/clinical-applications#reconstructive",
+    },
+    { linkLabel: "Gastrointestinal", href: "/clinical-applications#gastro" },
+    {
+      linkLabel: "Urology & Gynaecology",
+      href: "/clinical-applications#urology",
+    },
   ],
   documents: [
     {
