@@ -76,7 +76,11 @@ const FIELDS: Record<string, FieldMeta> = {
     weight: 53,
   },
   itemLinkHref: { label: "Per-card link address", weight: 54 },
-  file: { label: "File", weight: 55 },
+  file: {
+    label: "File",
+    hint: "The document a visitor downloads. Upload it to the media library first.",
+    weight: 55,
+  },
   external: { label: "Opens in a new tab", weight: 56 },
 
   // Values
@@ -125,6 +129,13 @@ export function orderFields(keys: string[]): string[] {
     const diff = fieldMeta(a).weight - fieldMeta(b).weight;
     return diff !== 0 ? diff : a.localeCompare(b);
   });
+}
+
+/** True when the field holds a document for the visitor to download. */
+export function isDocumentField(key: string, value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  if (/^(file|document|pdf|brochure|attachment|asset)$/i.test(key)) return true;
+  return /\.(pdf|docx?|xlsx?|pptx?|zip)$/i.test(value.trim());
 }
 
 /** True when the value is an image path the editor should preview. */

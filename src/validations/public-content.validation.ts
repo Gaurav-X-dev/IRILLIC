@@ -160,7 +160,15 @@ export const homeContentSchema = z.object({
     ),
   ),
   documents: z.array(
-    z.object({ cat: z.string(), title: z.string(), format: z.string() }),
+    // Rows saved before each document carried its own file are read with an
+    // empty one, rather than rejected: the page still renders while an editor
+    // attaches the PDFs.
+    z.object({
+      cat: z.string(),
+      title: z.string(),
+      format: z.string(),
+      file: z.string().default(""),
+    }),
   ),
 });
 

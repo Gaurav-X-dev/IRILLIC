@@ -331,9 +331,14 @@ export default async function HomePage() {
 
           <div className="docs">
             {content.documents.map((doc) => (
-              <Link
+              // The attached file when there is one, and the resource library
+              // otherwise. Every card used to lead to the library, whichever
+              // document it named, so four separate downloads all arrived at
+              // the same page and none of them downloaded anything.
+              <SmartLink
                 className="doc reveal"
-                href={content.sections.media.documentHref}
+                href={doc.file || content.sections.media.documentHref}
+                download={doc.file ? "" : undefined}
                 key={doc.title}
               >
                 <span className="doc__cat">{doc.cat}</span>
@@ -344,7 +349,7 @@ export default async function HomePage() {
                     <Download className="i" aria-hidden="true" />
                   </span>
                 </span>
-              </Link>
+              </SmartLink>
             ))}
           </div>
 

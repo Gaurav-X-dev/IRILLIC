@@ -252,19 +252,34 @@ export const HOME_CONTENT = {
       href: "/clinical-applications#urology",
     },
   ],
+  // No file is named here on purpose: these documents are not in the
+  // repository, so pointing at a path would promise a download that answers
+  // 404. An editor attaches each one from the media library.
   documents: [
     {
       cat: "Product literature",
       title: "Irillic nm: Instructions for Use",
       format: "PDF",
+      file: "",
     },
     {
       cat: "Product literature",
       title: "Irillic L nm: Instructions for Use",
       format: "PDF",
+      file: "",
     },
-    { cat: "Corporate", title: "Irillic Corporate Brochure", format: "PDF" },
-    { cat: "Media", title: "Media Kit & Brand Assets", format: "ZIP" },
+    {
+      cat: "Corporate",
+      title: "Irillic Corporate Brochure",
+      format: "PDF",
+      file: "",
+    },
+    {
+      cat: "Media",
+      title: "Media Kit & Brand Assets",
+      format: "ZIP",
+      file: "",
+    },
   ],
 };
 

@@ -6,6 +6,7 @@ import {
   ChevronUp,
   Eye,
   EyeOff,
+  FileText,
   Image as ImageIcon,
   Plus,
   Save,
@@ -14,7 +15,12 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CONTENT_ICON_NAMES } from "@/lib/content-icons";
-import { fieldMeta, isImageField, orderFields } from "@/lib/field-meta";
+import {
+  fieldMeta,
+  isDocumentField,
+  isImageField,
+  orderFields,
+} from "@/lib/field-meta";
 import { SECTION_GROUP_ORDER, sectionMeta } from "@/lib/section-meta";
 import { useToast } from "@/components/admin/toast";
 import { Req, RequiredNote } from "@/components/admin/ui";
@@ -774,6 +780,8 @@ export function VisualEditor({
     );
   if (isImageField(label, value))
     return <ImageField label={label} value={text} onChange={onChange} />;
+  if (isDocumentField(label, value))
+    return <FileField label={label} value={text} onChange={onChange} />;
   // Icons are a closed set, so offer the registry rather than a free-text box
   // an editor could misspell.
   if (label.toLowerCase() === "icon")
@@ -848,23 +856,104 @@ type MediaImage = { id: string; name: string; url: string; mimeType: string };
  */
 let mediaRequest: Promise<MediaImage[]> | null = null;
 
-function useMediaImages() {
-  const [images, setImages] = useState<MediaImage[]>([]);
+function useMediaAssets(kind: "image" | "document") {
+  const [assets, setAssets] = useState<MediaImage[]>([]);
   useEffect(() => {
     mediaRequest ??= fetch("/api/admin/media?limit=200")
       .then((response) => (response.ok ? response.json() : { data: [] }))
       .then((body) => (body.data as MediaImage[]) ?? [])
       .catch(() => []);
     let active = true;
-    mediaRequest.then((assets) => {
-      if (active)
-        setImages(assets.filter((a) => a.mimeType?.startsWith("image/")));
+    mediaRequest.then((all) => {
+      if (!active) return;
+      setAssets(
+        all.filter((a) =>
+          kind === "image"
+            ? a.mimeType?.startsWith("image/")
+            : !a.mimeType?.startsWith("image/"),
+        ),
+      );
     });
     return () => {
       active = false;
     };
-  }, []);
-  return images;
+  }, [kind]);
+  return assets;
+}
+
+/**
+ * A document the visitor downloads: a PDF, a guide, a kit.
+ *
+ * The same shape as the image field, with the library filtered the other way
+ * round. Without it a download's address was a bare text box, so a brochure
+ * already sitting in the media library still had to have its path typed out
+ * by hand -- and a document section with no address field at all offered
+ * nowhere to put it.
+ */
+function FileField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (next: string) => void;
+}) {
+  const meta = fieldMeta(label);
+  const documents = useMediaAssets("document");
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-[11px] font-semibold text-ad-muted">
+        {meta.label}
+      </span>
+      <span className="flex items-start gap-3">
+        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-ad-sunken ring-1 ring-ad-line">
+          <FileText
+            size={16}
+            className={value ? "text-ad-accent" : "text-ad-faint"}
+            aria-hidden="true"
+          />
+        </span>
+        <span className="min-w-0 flex-1">
+          <input
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            placeholder="/uploads/documents/instructions-for-use.pdf"
+            className="h-10 w-full rounded-lg bg-ad-surface px-3 text-sm outline-none ring-1 ring-ad-line focus:ring-ad-accent"
+          />
+          {documents.length ? (
+            <select
+              aria-label="Choose a document from the media library"
+              value={documents.some((a) => a.url === value) ? value : ""}
+              onChange={(event) => onChange(event.target.value)}
+              className="mt-1.5 h-9 w-full rounded-lg bg-ad-surface px-2 text-xs outline-none ring-1 ring-ad-line focus:ring-ad-accent"
+            >
+              <option value="">Choose a document from the library…</option>
+              {documents.map((asset) => (
+                <option key={asset.id} value={asset.url}>
+                  {asset.name}
+                </option>
+              ))}
+            </select>
+          ) : null}
+          <span className="mt-1.5 block text-[11px] text-ad-faint">
+            Upload the file in the{" "}
+            {/* New tab: this form may hold unsaved edits. */}
+            <Link
+              href="/dashboard/media"
+              target="_blank"
+              rel="noopener"
+              className="text-ad-accent underline"
+            >
+              media library
+            </Link>
+            <span className="sr-only">(opens in a new tab)</span>, then choose
+            it here.
+          </span>
+        </span>
+      </span>
+    </label>
+  );
 }
 
 /** An image path with a live thumbnail, so an editor sees what they picked. */
@@ -878,7 +967,7 @@ function ImageField({
   onChange: (next: string) => void;
 }) {
   const meta = fieldMeta(label);
-  const images = useMediaImages();
+  const images = useMediaAssets("image");
   return (
     <label className="block">
       <span className="mb-1.5 block text-[11px] font-semibold text-ad-muted">
