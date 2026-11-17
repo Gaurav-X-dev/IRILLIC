@@ -85,7 +85,11 @@ const FIELDS: Record<string, FieldMeta> = {
 
   // Values
   value: { label: "Value", weight: 60 },
-  prefix: { label: "Prefix", weight: 61 },
+  prefix: {
+    label: "Prefix",
+    hint: 'Shown before the number, for example "<", "~" or "up to". Leave empty for none.',
+    weight: 59,
+  },
   suffix: { label: "Suffix", weight: 62 },
   unit: { label: "Unit", weight: 62 },
   year: { label: "Year", weight: 63 },

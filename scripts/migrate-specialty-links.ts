@@ -21,6 +21,10 @@ import { contentEntries, pageSections } from "../src/db/schema";
  * none of them downloaded anything. Each now carries a `file`, added empty
  * here because the documents themselves are not in the repository -- an
  * editor attaches them from the media library.
+ *
+ * The performance figures gained an optional `prefix` for the same reason:
+ * a number sometimes needs qualifying -- "<97%", "up to 150" -- and there
+ * was nowhere to say so.
  */
 
 const DESTINATIONS: [RegExp, string][] = [
@@ -44,16 +48,26 @@ function upgrade(value: unknown): { linkLabel: string; href: string }[] | null {
   }));
 }
 
-/** Null when every document already has a file field. */
-function withFileField(value: unknown): Record<string, unknown>[] | null {
+/**
+ * Adds a field to every object in a list, or null when they all have it.
+ *
+ * The panel renders the keys the stored data holds, so a field added to the
+ * schema is invisible until it is in the row -- an editor cannot fill in a
+ * box that is not drawn.
+ */
+function withField(
+  value: unknown,
+  key: string,
+  fallback: unknown,
+): Record<string, unknown>[] | null {
   if (!Array.isArray(value)) return null;
-  const documents = value.filter(
+  const items = value.filter(
     (item): item is Record<string, unknown> =>
       Boolean(item) && typeof item === "object" && !Array.isArray(item),
   );
-  if (documents.length !== value.length) return null;
-  if (documents.every((item) => "file" in item)) return null;
-  return documents.map((item) => ({ file: "", ...item }));
+  if (items.length !== value.length) return null;
+  if (items.every((item) => key in item)) return null;
+  return items.map((item) => ({ [key]: fallback, ...item }));
 }
 
 async function main() {
@@ -76,19 +90,26 @@ async function main() {
         console.log(`  ${link.linkLabel} -> ${link.href || "(no address)"}`);
     }
 
-    const documentSections = await db
-      .select()
-      .from(pageSections)
-      .where(eq(pageSections.sectionKey, "documents"));
-    for (const section of documentSections) {
-      const next = withFileField(section.data);
-      if (!next) continue;
-      await db
-        .update(pageSections)
-        .set({ data: next })
-        .where(eq(pageSections.id, section.id));
-      changed += 1;
-      console.log(`  ${next.length} document cards can now name a file`);
+    // Each list that gained a field, and what the field is called in it.
+    const additions: [string, string, unknown, string][] = [
+      ["documents", "file", "", "document cards can now name a file"],
+      ["figures", "prefix", "", "figures can now carry a prefix"],
+    ];
+    for (const [sectionKey, field, fallback, description] of additions) {
+      const rows = await db
+        .select()
+        .from(pageSections)
+        .where(eq(pageSections.sectionKey, sectionKey));
+      for (const section of rows) {
+        const next = withField(section.data, field, fallback);
+        if (!next) continue;
+        await db
+          .update(pageSections)
+          .set({ data: next })
+          .where(eq(pageSections.id, section.id));
+        changed += 1;
+        console.log(`  ${next.length} ${description}`);
+      }
     }
 
     // The sections table is what the panel edits, but the page's own content
@@ -100,8 +121,9 @@ async function main() {
     for (const page of pages) {
       const content = page.content as Record<string, unknown>;
       const links = upgrade(content.specialtyLinks);
-      const documents = withFileField(content.documents);
-      if (!links && !documents) continue;
+      const documents = withField(content.documents, "file", "");
+      const figures = withField(content.figures, "prefix", "");
+      if (!links && !documents && !figures) continue;
       await db
         .update(contentEntries)
         .set({
@@ -109,6 +131,7 @@ async function main() {
             ...content,
             ...(links ? { specialtyLinks: links } : {}),
             ...(documents ? { documents } : {}),
+            ...(figures ? { figures } : {}),
           },
         })
         .where(eq(contentEntries.id, page.id));

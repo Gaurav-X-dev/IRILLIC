@@ -152,6 +152,13 @@ export default async function HomePage() {
                 <div className="figure" key={f.label}>
                   <dt>{f.label}</dt>
                   <dd>
+                    {/* Set only when a figure needs qualifying -- "up to",
+                        "<", "~". Rendered in the same small blue type as the
+                        certification's "ISO", and left out entirely when
+                        empty so an unqualified number keeps its spacing. */}
+                    {f.prefix ? (
+                      <span className="figure__pre">{f.prefix}</span>
+                    ) : null}
                     <Counter target={f.value} />
                     <span className="figure__unit">{f.unit}</span>
                   </dd>
@@ -161,7 +168,7 @@ export default async function HomePage() {
                   <p>{f.text}</p>
                 </div>
               ))}
-              <div className="figure">
+              <div className="figure figure--cert">
                 <dt>{content.sections.performance.certification.label}</dt>
                 <dd>
                   <span className="figure__pre">

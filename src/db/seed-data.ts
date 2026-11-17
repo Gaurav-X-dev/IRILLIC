@@ -188,12 +188,14 @@ export const HOME_CONTENT = {
   figures: [
     {
       label: "Procedures supported",
+      prefix: "",
       value: 5000,
       unit: "+",
       text: "Open and minimally invasive procedures performed with Irillic fluorescence imaging.",
     },
     {
       label: "Surgical centres",
+      prefix: "",
       value: 300,
       unit: "+",
       text: "Hospitals and surgical centres equipped with Irillic systems and trained teams.",

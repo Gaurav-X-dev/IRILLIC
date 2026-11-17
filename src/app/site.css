@@ -1082,7 +1082,7 @@ body.is-locked {
 .figure dd .figure__unit:last-child {
   font-size: 1em;
 }
-.figure dd .figure__pre ~ .figure__unit {
+.figure--cert dd .figure__pre ~ .figure__unit {
   font-size: 0.42em;
   vertical-align: 0.9em;
 }

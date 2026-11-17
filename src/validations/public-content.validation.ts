@@ -129,6 +129,10 @@ export const homeContentSchema = z.object({
     .array(
       z.object({
         label: z.string(),
+        // Optional, and defaulted so a figure saved before this field
+        // existed still validates: the panel adds it to the stored row the
+        // next time the section is saved.
+        prefix: z.string().default(""),
         value: z.number().nonnegative(),
         unit: z.string(),
         text: z.string(),
