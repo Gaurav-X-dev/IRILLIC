@@ -1072,19 +1072,31 @@ body.is-locked {
 .figure__unit {
   color: var(--blue);
 }
+/* A qualifier on a figure -- ">", "<", "~" -- is part of the number and is
+   read with it, so it sits on the same baseline at close to the same size and
+   in the same light weight. At 0.42em and raised nearly a full em it read as
+   a footnote mark that had drifted in from somewhere else. */
 .figure__pre {
-  font-size: 0.42em;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  vertical-align: 0.9em;
+  font-size: 0.66em;
+  font-weight: 300;
+  margin-right: 0.04em;
   color: var(--blue);
 }
 .figure dd .figure__unit:last-child {
   font-size: 1em;
 }
+/* The certification is a lockup rather than a qualified number: "ISO" names
+   the standard and "13485:2016" identifies it. Set on the baseline, smaller
+   and bolder, the three parts read as one name -- raised, "ISO" floated above
+   its own number and the year hung off the end of it. */
+.figure--cert .figure__pre {
+  font-size: 0.4em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
 .figure--cert dd .figure__pre ~ .figure__unit {
-  font-size: 0.42em;
-  vertical-align: 0.9em;
+  font-size: 0.4em;
+  font-weight: 400;
 }
 .figure__bar {
   display: block;
