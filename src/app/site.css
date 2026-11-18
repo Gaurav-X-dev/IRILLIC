@@ -1085,18 +1085,33 @@ body.is-locked {
 .figure dd .figure__unit:last-child {
   font-size: 1em;
 }
-/* The certification is a lockup rather than a qualified number: "ISO" names
-   the standard and "13485:2016" identifies it. Set on the baseline, smaller
-   and bolder, the three parts read as one name -- raised, "ISO" floated above
-   its own number and the year hung off the end of it. */
-.figure--cert .figure__pre {
-  font-size: 0.4em;
+/* The certification is a name, not a measurement. "ISO 13485:2016" is one
+   string and is read as one, so all three parts are set at one size and one
+   weight -- the standard's own typography. Sharing the figures' 64px numeral
+   made the middle of the name tower over the two ends of it.
+
+   The lockup is smaller than its neighbours, so the box keeps their height
+   and sits the name on the bottom of it: that puts this baseline on theirs
+   and keeps the four rules underneath on one line. */
+.figure--cert dd {
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(40px, 4.2vw, 64px);
+  font-size: clamp(18px, 1.7vw, 26px);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+}
+.figure--cert .figure__pre {
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  /* The markup's own space between "ISO" and the number is whitespace, and a
+     flex container drops that, so the gap is set here instead. */
+  margin-right: 0.4em;
 }
 .figure--cert dd .figure__pre ~ .figure__unit {
-  font-size: 0.4em;
-  font-weight: 400;
+  font-size: 1em;
+  font-weight: 700;
 }
 .figure__bar {
   display: block;
