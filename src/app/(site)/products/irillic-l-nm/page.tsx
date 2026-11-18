@@ -25,6 +25,7 @@ import { SubNav } from "@/components/shared/sub-nav";
 import { TabSet, type TabItem } from "@/components/shared/tab-set";
 import { getPublishedEntry } from "@/services/cms.service";
 import { cmsMetadata } from "@/lib/cms-metadata";
+import { downloadName } from "@/lib/download-name";
 import { lnmDetailContentSchema } from "@/validations/public-content.validation";
 import { SmartLink } from "@/components/shared/smart-link";
 
@@ -251,7 +252,7 @@ export default async function ProductDetailPage() {
               <SmartLink
                 className="doc reveal"
                 href={d.href}
-                download
+                download={downloadName(d.title, d.href)}
                 key={d.title}
               >
                 <span className="doc__cat">{d.cat}</span>

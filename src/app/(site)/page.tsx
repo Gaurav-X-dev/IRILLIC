@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Counter } from "@/components/shared/counter";
+import { downloadName } from "@/lib/download-name";
 import {
   HeroCarousel,
   type HeroSlide,
@@ -345,7 +346,9 @@ export default async function HomePage() {
               <SmartLink
                 className="doc reveal"
                 href={doc.file || content.sections.media.documentHref}
-                download={doc.file ? "" : undefined}
+                download={
+                  doc.file ? downloadName(doc.title, doc.file) : undefined
+                }
                 key={doc.title}
               >
                 <span className="doc__cat">{doc.cat}</span>

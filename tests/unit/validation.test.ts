@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { z } from "zod";
 import { clientIp, databaseErrorCode, zodMessage } from "../../src/lib/api";
+import { downloadName } from "../../src/lib/download-name";
 import { isSafePublicUrl } from "../../src/lib/safe-url";
 import { hasExpectedFileSignature } from "../../src/lib/file-signature";
 import {
@@ -253,4 +254,30 @@ test("a validation message names the field, the item and every problem", () => {
   // The index is what tells an editor which of the repeated cards to open.
   assert.match(message, /Divisions, item 2 › Title/);
   assert.match(message, /Divisions, item 2 › Href/);
+});
+
+test("a download is saved under the name on the card", () => {
+  // Uploads are stored under a random identifier; the visitor should never
+  // see it.
+  assert.equal(
+    downloadName(
+      "IRILLIC Corporate Brochure",
+      "/uploads/general/27cb629a-c512-4597-a6ca-85bed3a79519.pdf",
+    ),
+    "IRILLIC Corporate Brochure.pdf",
+  );
+  assert.equal(
+    downloadName("Media Kit & Brand Assets", "/uploads/media/abc.zip"),
+    "Media Kit & Brand Assets.zip",
+  );
+  // A title cannot decide anything about a path, so the separators go.
+  assert.equal(
+    downloadName("IRILLIC L.nm: Instructions/Use", "/docs/ifu.pdf"),
+    "IRILLIC L.nm Instructions Use.pdf",
+  );
+  // A query string is not part of the extension, and a file without one
+  // keeps the title alone.
+  assert.equal(downloadName("Spec sheet", "/docs/s.pdf?v=2"), "Spec sheet.pdf");
+  assert.equal(downloadName("Spec sheet", "/docs/sheet"), "Spec sheet");
+  assert.equal(downloadName("  ", "/docs/x.pdf"), "download.pdf");
 });
